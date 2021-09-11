@@ -1,0 +1,77 @@
+{
+  "project_info": {
+    "project_number": "359655609071",
+    "firebase_url": "https://sigeoo-default-rtdb.firebaseio.com",
+    "project_id": "sigeoo",
+    "storage_bucket": "sigeoo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:359655609071:android:137b1243b4d130d8ca411a",
+        "android_client_info": {
+          "package_name": "ac.id.ubpkarawang.sigeoo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "359655609071-kvituccr31em48q7k9mh78kekj530em5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ac.id.ubpkarawang.sigeoo",
+            "certificate_hash": "11668ff3f43df7d82b6308f3c7f3fca525d5b2fc"
+          }
+        },
+        {
+          "client_id": "359655609071-sj1pnn55i34glf2nr8grfqn335bg6vd5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBM2ZkgFQ5sikxRu5A0okBlTZMTyrdM1H0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "359655609071-sj1pnn55i34glf2nr8grfqn335bg6vd5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:359655609071:android:2fbfaadfe27fd266ca411a",
+        "android_client_info": {
+          "package_name": "opencv.org"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "359655609071-sj1pnn55i34glf2nr8grfqn335bg6vd5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBM2ZkgFQ5sikxRu5A0okBlTZMTyrdM1H0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "359655609071-sj1pnn55i34glf2nr8grfqn335bg6vd5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

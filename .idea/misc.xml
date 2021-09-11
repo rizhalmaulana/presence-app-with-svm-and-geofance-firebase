@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/Rizal Maulana/AndroidStudioProjects/Sigeoo/app/src/main/res/drawable/board_white.xml" value="0.14879725085910653" />
+        <entry key="..\:/Users/Rizal Maulana/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/activity_login.xml" value="0.13541666666666666" />
+        <entry key="..\:/Users/Rizal Maulana/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/activity_onboarding.xml" value="0.15" />
+        <entry key="..\:/Users/Rizal Maulana/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/activity_register.xml" value="0.13958333333333334" />
+        <entry key="..\:/Users/Rizal Maulana/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/fragment_informasi.xml" value="0.13829047949965254" />
+        <entry key="..\:/Users/Rizal Maulana/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/fragment_profil.xml" value="0.13541666666666666" />
+        <entry key="..\:/Users/Rizal Maulana/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/fragment_utama.xml" value="0.14" />
+        <entry key="..\:/Users/Rizal Maulana/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/menu_layout.xml" value="0.17" />
+        <entry key="..\:/Users/Rizal Maulana/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/menu_status_pegawai.xml" value="0.15" />
+        <entry key="..\:/Users/Rizal Maulana/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/view_item_informasi.xml" value="0.14965277777777777" />
+        <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/drawable/button_save.xml" value="0.14879725085910653" />
+        <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/drawable/button_white.xml" value="0.14879725085910653" />
+        <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/drawable/rounded.xml" value="0.14879725085910653" />
+        <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/activity_login.xml" value="0.15" />
+        <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/activity_main.xml" value="0.13" />
+        <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/activity_onboarding.xml" value="0.13680555555555557" />
+        <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/activity_register.xml" value="0.13958333333333334" />
+        <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/activity_splash_screen.xml" value="0.14" />
+        <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/fragment_informasi.xml" value="0.17" />
+        <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/fragment_profil.xml" value="0.13958333333333334" />
+        <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/fragment_utama.xml" value="0.13958333333333334" />
+        <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/view_item_informasi.xml" value="0.13814432989690723" />
+        <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/menu/bottom_nav_menu.xml" value="0.13958333333333334" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="false" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_utama">
+
+    <fragment
+        android:id="@+id/navigation_informasi"
+        android:name="ac.id.ubpkarawang.sigeoo.Screens.informasi.InformasiFragment"
+        android:label="@string/informasi"
+        tools:layout="@layout/fragment_profil" />
+
+    <fragment
+        android:id="@+id/navigation_utama"
+        android:name="ac.id.ubpkarawang.sigeoo.Screens.utama.UtamaFragment"
+        android:label="@string/utama"
+        tools:layout="@layout/fragment_utama" />
+
+    <fragment
+        android:id="@+id/navigation_profil"
+        android:name="ac.id.ubpkarawang.sigeoo.Screens.profil.ProfilFragment"
+        android:label="@string/profil"
+        tools:layout="@layout/fragment_profil" />
+</navigation>
