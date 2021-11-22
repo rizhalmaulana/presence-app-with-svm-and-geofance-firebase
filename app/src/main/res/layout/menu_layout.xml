@@ -1,18 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="50dp"
+        android:padding="@dimen/spacer_small">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_banner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:visibility="invisible"
+            android:indeterminate="true"
+            app:indicatorColor="@color/colorPrimaryDark"
+            app:trackThickness="3dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycle_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:listitem="@layout/view_item_banner"
+            android:layout_margin="@dimen/spacer_small" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/spacer_large"
+        android:layout_marginEnd="@dimen/spacer_large"
+        android:layout_marginTop="20dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="UnknownIdInLayout">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp" >
+
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="300dp"
+                android:src="@drawable/coronavirus"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="150dp"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/baloobhai_bold"
+                android:text="CHECK COVID-19"
+                android:textColor="@color/black_main"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView4"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/baloobhai_medium"
+                android:text="Self-Assesment Covid-19"
+                android:textColor="@color/black_main"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/textView3"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_periksa"
+                android:layout_width="70dp"
+                android:layout_height="35dp"
+                app:cardBackgroundColor="@color/colorPrimary"
+                app:cardCornerRadius="3dp"
+                android:layout_marginStart="245dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/baloobhai_medium"
+                    android:text="PERIKSA"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fillViewport="true"
         android:orientation="vertical"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,12 +139,10 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/lrMasuk"
+                android:id="@+id/lr_masuk"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/board_white"
                 android:clickable="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="vertical"
@@ -40,7 +151,7 @@
                 <ImageView
                     android:id="@+id/ivMasuk"
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="center_vertical|center_horizontal"
                     android:contentDescription="@string/todo"
                     app:srcCompat="@drawable/bag" />
@@ -61,12 +172,10 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/lrPulang"
+                android:id="@+id/lr_pulang"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/board_white"
                 android:clickable="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="vertical"
@@ -75,7 +184,7 @@
                 <ImageView
                     android:id="@+id/ivPulang"
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="center_vertical|center_horizontal"
                     android:contentDescription="@string/todo"
                     app:srcCompat="@drawable/out" />
@@ -96,12 +205,10 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/lrLokasi"
+                android:id="@+id/lr_lokasi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/board_white"
                 android:clickable="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="vertical"
@@ -111,7 +218,7 @@
                 <ImageView
                     android:id="@+id/ivLokasi"
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="center_vertical|center_horizontal"
                     android:contentDescription="@string/todo"
                     app:srcCompat="@drawable/myloc" />
@@ -140,13 +247,11 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/lrJadwal"
+                android:id="@+id/lr_jadwal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/board_white"
                 android:clickable="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="vertical"
@@ -156,7 +261,7 @@
                 <ImageView
                     android:id="@+id/ivTrip"
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="center_vertical|center_horizontal"
                     android:contentDescription="@string/todo"
                     app:srcCompat="@drawable/jadwal" />
@@ -177,13 +282,11 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/lrKelolaData"
+                android:id="@+id/lr_keloladata"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/board_white"
                 android:clickable="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="vertical"
@@ -193,7 +296,7 @@
                 <ImageView
                     android:id="@+id/ivKelola"
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="center_vertical|center_horizontal"
                     android:contentDescription="@string/todo"
                     app:srcCompat="@drawable/verification" />
@@ -214,13 +317,11 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/lrLogout"
+                android:id="@+id/lr_logout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/board_white"
                 android:clickable="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="vertical"
@@ -230,7 +331,7 @@
                 <ImageView
                     android:id="@+id/ivKeluar"
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="center_vertical|center_horizontal"
                     android:contentDescription="@string/todo"
                     app:srcCompat="@drawable/logout" />
@@ -251,4 +352,5 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
 </LinearLayout>

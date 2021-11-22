@@ -1,16 +1,30 @@
 package ac.id.ubpkarawang.sigeoo.Screens;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+
+import java.util.List;
 
 import ac.id.ubpkarawang.sigeoo.Adapters.ViewPagerAdapter;
 import ac.id.ubpkarawang.sigeoo.R;
@@ -24,14 +38,43 @@ public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     ViewPager viewPager;
     MenuItem prevMenuItem;
-
     boolean doubleBackToExit = false;
+    private static final String TAG = "MainActivity";
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Dexter.withContext(this)
+                .withPermissions(
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ).withListener(new MultiplePermissionsListener() {
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                if (report.areAllPermissionsGranted()) {
+                    Toast.makeText(MainActivity.this, "Izin akses aplikasi berhasil", Toast.LENGTH_SHORT).show();
+                }
+
+                if (report.isAnyPermissionPermanentlyDenied()) {
+                    Toast.makeText(MainActivity.this, "Izin akses aplikasi ditolak", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onPermissionsChecked: " + report.getDeniedPermissionResponses());
+                }
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                token.continuePermissionRequest();
+            }
+        }).withErrorListener(error -> {
+            Toast.makeText(MainActivity.this, "Terjadi masalah " + error.toString(), Toast.LENGTH_SHORT).show();
+        }).check();
 
         viewPager = findViewById(R.id.vp1);
         bottomNavigationView = findViewById(R.id.nav_view);
@@ -63,12 +106,10 @@ public class MainActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 if (prevMenuItem != null) {
                     prevMenuItem.setChecked(false);
-                }
-                else
-                {
+                } else {
                     bottomNavigationView.getMenu().getItem(0).setChecked(false);
                 }
-                Log.d("page",""+position);
+                Log.d("page", "" + position);
                 bottomNavigationView.getMenu().getItem(position).setChecked(true);
                 prevMenuItem = bottomNavigationView.getMenu().getItem(position);
             }
@@ -83,16 +124,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        adapter  = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.AddFragment(new InformasiFragment(),"");
-        adapter.AddFragment(new UtamaFragment(),"");
-        adapter.AddFragment(new ProfilFragment(),"");
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.AddFragment(new InformasiFragment(), "");
+        adapter.AddFragment(new UtamaFragment(), "");
+        adapter.AddFragment(new ProfilFragment(), "");
         viewPager.setAdapter(adapter);
     }
 
     @Override
     public void onBackPressed() {
-        if (doubleBackToExit){
+        if (doubleBackToExit) {
             super.onBackPressed();
             return;
         }
@@ -101,5 +142,29 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "Tekan sekali lagi untuk keluar", Toast.LENGTH_LONG).show();
 
         new Handler().postDelayed(() -> doubleBackToExit = false, 2000);
+    }
+
+    private final BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            if (status == LoaderCallbackInterface.SUCCESS) {
+                Log.i(TAG, "OpenCV loaded successfully");
+            } else {
+                super.onManagerConnected(status);
+            }
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (!OpenCVLoader.initDebug()) {
+            Log.d(TAG, "Library OpenCV tidak ditemukan. Menggunakan OpenCV Manager untuk inisialisasi");
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_4_0, this, mLoaderCallback);
+        } else {
+            Log.d(TAG, "Library OpenCV ditemukan di dalam paket!");
+            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
     }
 }

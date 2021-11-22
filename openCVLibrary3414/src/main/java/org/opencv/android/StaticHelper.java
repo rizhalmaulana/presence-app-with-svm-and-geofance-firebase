@@ -12,8 +12,7 @@ class StaticHelper {
         boolean result;
         String libs = "";
 
-        if(InitCuda)
-        {
+        if(InitCuda) {
             loadLibrary("cudart");
             loadLibrary("nppc");
             loadLibrary("nppi");
@@ -24,18 +23,16 @@ class StaticHelper {
 
         Log.d(TAG, "Trying to get library list");
 
-        try
-        {
+        try {
             System.loadLibrary("opencv_info");
             libs = getLibraryList();
-        }
-        catch(UnsatisfiedLinkError e)
-        {
+        } catch(UnsatisfiedLinkError e) {
             Log.e(TAG, "OpenCV error: Cannot load info library for OpenCV");
         }
 
         Log.d(TAG, "Library list: \"" + libs + "\"");
         Log.d(TAG, "First attempt to load libs");
+
         if (initOpenCVLibs(libs))
         {
             Log.d(TAG, "First attempt to load libs is OK");

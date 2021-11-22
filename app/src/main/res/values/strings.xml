@@ -47,4 +47,25 @@
     <string name="haarcascade_lefteye">haarcascade_lefteye_2splits</string>
     <string name="haarcascade_righteye">haarcascade_righteye_2splits</string>
     <string name="title_activity_maps">Map</string>
+
+    <string name="no_1">1. Saya Pergi Keluar Rumah</string>
+    <string name="no_2">2. Saya Menggunakan Transportasi Umum : Onine, angkot, bus,    taksi. kereta api</string>
+    <string name="no_3">3. Saya Tidak Menggunakan Masker saat berkumpul dengan orang lain</string>
+    <string name="no_4">4. Saya berjabat tangan dengan orang lain</string>
+    <string name="no_5">5. Saya tidak membersihkan tangan dengan handsanitizer / tissue basah sebelum pegang kemudi motor/mobil</string>
+    <string name="no_6">6. Saya menyantuh benda/ uang yang juga disentuh dengan orang lain</string>
+    <string name="no_7">7. Saya tidak menjaga jarak 1.5 Meter dengan orang lain ketika : belanja, bekerja, belajar, ibadah</string>
+    <string name="no_9">9. Saya tidak minum hangat dan cuci tangan degan sabun setelah tiba ditujuan</string>
+    <string name="no_10">10. Saya berada diwilayah kelurahan tempat pasien tertular</string>
+    <string name="no_11">11. Saya tidak pasang handsanitizer di depan pintu masuk, untuk kebersihan tangan sebelum pegang gagang pintu(handle) pintu rumah</string>
+    <string name="no_12">12. Saya tidak mencuci tangan dengan sabun setelah tiba dirumah</string>
+    <string name="no_13">13. Saya tidak menyediakan : tissue basah/antiseptic, masker, sabun antiseptic bagi keluarga dirumah</string>
+    <string name="no_14">14. Saya tidak segera meren dam baju dan celana bekas pakai diluar ke dalam air panas/sabun</string>
+    <string name="no_15">15. Saya tidak segera mandi keramas setelah saya tiba dirumah</string>
+    <string name="no_16">16. Saya tidak mensosialisasikan check list penilaian resiko pribadi kepada keluarga dirumah</string>
+    <string name="no_17">17. Saya salam sehari tidak kena cahaya matahari minimal 15 menit</string>
+    <string name="no_18">18. Saya tidak jalan kaki / berolahraga minimal 30 menit setiap hari</string>
+    <string name="no_19">19. Saya Jarang minum vitamin C dan E dan kurang Tidur</string>
+    <string name="no_20">20. Usia saya diatas 60 tahun</string>
+    <string name="no_21">21. Saya mempunyai penyakit : jantung/diabetes/gangguan pernafasan kronik</string>
 </resources>

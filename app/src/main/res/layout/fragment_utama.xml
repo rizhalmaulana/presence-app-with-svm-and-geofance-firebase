@@ -4,10 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/boarding_background"
+    android:background="@drawable/flip_boarding_background"
     tools:context=".Screens.utama.UtamaFragment">
 
-    <include layout="@layout/menu_status_pegawai"/>
+    <include
+        android:id="@+id/fragment_sigeoo_toolbar"
+        layout="@layout/view_topbar_sigeoo" />
 
     <include layout="@layout/menu_layout" />
 
