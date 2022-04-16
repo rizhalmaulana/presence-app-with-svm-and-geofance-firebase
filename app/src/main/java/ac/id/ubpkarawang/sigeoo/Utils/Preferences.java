@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 
-import ac.id.ubpkarawang.sigeoo.Model.Staf;
+import ac.id.ubpkarawang.sigeoo.Model.Akun.Staf;
 
 public class Preferences {
     public static Staf getStaf(Context context){

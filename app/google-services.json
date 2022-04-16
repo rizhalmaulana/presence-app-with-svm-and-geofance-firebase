@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "359655609071-1mc7elp4j0dnsifanghns3g99d9n72ko.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ac.id.ubpkarawang.sigeoo",
+            "certificate_hash": "b11cf5c22f637d988e10f9f4a4274fc78cbf537c"
+          }
+        },
+        {
           "client_id": "359655609071-kvituccr31em48q7k9mh78kekj530em5.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

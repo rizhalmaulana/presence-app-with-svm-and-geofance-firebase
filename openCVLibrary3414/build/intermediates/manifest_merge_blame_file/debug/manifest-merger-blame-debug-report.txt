@@ -6,8 +6,8 @@
 6
 7    <uses-sdk
 8        android:minSdkVersion="21"
-8-->C:\Users\Rizal Maulana\AndroidStudioProjects\Sigeoo\openCVLibrary3414\src\main\AndroidManifest.xml
-9        android:targetSdkVersion="30" />
-9-->C:\Users\Rizal Maulana\AndroidStudioProjects\Sigeoo\openCVLibrary3414\src\main\AndroidManifest.xml
+8-->D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
+9        android:targetSdkVersion="31" />
+9-->D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
 10
 11</manifest>
