@@ -7,10 +7,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -42,13 +42,16 @@
         <activity
             android:name=".Screens.MapsActivity"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".Screens.SplashActivity">
+
+        <activity android:name=".Screens.SplashActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".Screens.OnboardingActivity" />
         <activity android:name=".Screens.MainActivity" />
         <activity android:name=".Screens.RegisterActivity" />

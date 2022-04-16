@@ -41,7 +41,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -66,7 +65,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import ac.id.ubpkarawang.sigeoo.Model.MyLatLng;
+import ac.id.ubpkarawang.sigeoo.Model.Informasi.MyLatLng;
 import ac.id.ubpkarawang.sigeoo.R;
 import ac.id.ubpkarawang.sigeoo.Utils.LoadLocationListener;
 
@@ -136,7 +135,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         result.addOnCompleteListener(task -> {
             try {
                 LocationSettingsResponse response = task.getResult(ApiException.class);
-                Toast.makeText(MapsActivity.this, "GPS sudah aktif", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity.this, "Lokasi sudah aktif", Toast.LENGTH_SHORT).show();
             } catch (ApiException e) {
                 switch (e.getStatusCode()) {
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
@@ -318,10 +317,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (requestCode == REQUEST_CHECK_SETTING) {
             switch (resultCode) {
                 case Activity.RESULT_OK:
-                    Toast.makeText(this, "GPS berhasil diaktifkan", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Lokasi berhasil diaktifkan", Toast.LENGTH_SHORT).show();
                     break;
                 case Activity.RESULT_CANCELED:
-                    Toast.makeText(this, "GPS diperlukan, silahkan aktifkan!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Lokasi diperlukan, silahkan aktifkan!", Toast.LENGTH_SHORT).show();
             }
         }
     }

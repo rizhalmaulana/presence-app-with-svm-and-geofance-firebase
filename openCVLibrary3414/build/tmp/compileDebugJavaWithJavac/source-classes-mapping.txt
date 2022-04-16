@@ -4,8 +4,8 @@ org/opencv/objdetect/BaseCascadeClassifier.java
  org.opencv.objdetect.BaseCascadeClassifier
 org/opencv/objdetect/HOGDescriptor.java
  org.opencv.objdetect.HOGDescriptor
-org/opencv/ml/SVM.java
- org.opencv.ml.SVM
+org/opencv/android/OpenCVLoader.java
+ org.opencv.android.OpenCVLoader
 org/opencv/core/MatOfPoint3.java
  org.opencv.core.MatOfPoint3
 org/opencv/features2d/AffineFeature.java
@@ -96,8 +96,8 @@ org/opencv/dnn/Layer.java
  org.opencv.dnn.Layer
 org/opencv/osgi/OpenCVInterface.java
  org.opencv.osgi.OpenCVInterface
-org/opencv/utils/Converters.java
- org.opencv.utils.Converters
+org/opencv/android/StaticHelper.java
+ org.opencv.android.StaticHelper
 org/opencv/dnn/DictValue.java
  org.opencv.dnn.DictValue
 org/opencv/core/MatOfFloat6.java
@@ -306,7 +306,7 @@ org/opencv/core/Point.java
  org.opencv.core.Point
 org/opencv/ml/StatModel.java
  org.opencv.ml.StatModel
-org/opencv/android/OpenCVLoader.java
- org.opencv.android.OpenCVLoader
-org/opencv/android/StaticHelper.java
- org.opencv.android.StaticHelper
+org/opencv/utils/Converters.java
+ org.opencv.utils.Converters
+org/opencv/ml/SVM.java
+ org.opencv.ml.SVM

@@ -8,6 +8,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidStudioProject/presence-app-with-svm-and-geofance-firebase/app/src/main/res/layout/activity_login.xml" value="0.18" />
+        <entry key="..\:/AndroidStudioProject/presence-app-with-svm-and-geofance-firebase/app/src/main/res/layout/activity_main.xml" value="0.15534420289855072" />
+        <entry key="..\:/AndroidStudioProject/presence-app-with-svm-and-geofance-firebase/app/src/main/res/layout/activity_onboarding.xml" value="0.14965277777777777" />
+        <entry key="..\:/AndroidStudioProject/presence-app-with-svm-and-geofance-firebase/app/src/main/res/layout/activity_splash_screen.xml" value="0.14965277777777777" />
+        <entry key="..\:/AndroidStudioProject/presence-app-with-svm-and-geofance-firebase/app/src/main/res/layout/fragment_informasi.xml" value="0.16" />
+        <entry key="..\:/AndroidStudioProject/presence-app-with-svm-and-geofance-firebase/app/src/main/res/layout/fragment_utama.xml" value="0.13" />
         <entry key="..\:/Users/Rizal Maulana/AndroidStudioProjects/Sigeoo/app/src/main/res/drawable/board_white.xml" value="0.14879725085910653" />
         <entry key="..\:/Users/Rizal Maulana/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/activity_login.xml" value="0.13541666666666666" />
         <entry key="..\:/Users/Rizal Maulana/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/activity_onboarding.xml" value="0.15" />
@@ -34,7 +40,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="false" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

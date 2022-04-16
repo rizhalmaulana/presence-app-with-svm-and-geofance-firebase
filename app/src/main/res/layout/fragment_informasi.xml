@@ -43,27 +43,12 @@
                         android:id="@+id/textKasusCovid"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginRight="16dp"
+                        android:layout_margin="16dp"
                         android:visibility="visible"
                         android:fontFamily="@font/baloobhaijan"
-                        android:text="Maskerku melindungi kamu, maskermu melindungi aku!"
+                        android:text="Jumlah kasus di Indonesia saat ini."
                         android:textColor="@color/colorPrimaryDark"
                         android:textSize="20sp" />
-
-                    <TextView
-                        android:id="@+id/textUpdateKasus"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginBottom="10dp"
-                        android:fontFamily="@font/baloobhai_medium"
-                        android:visibility="visible"
-                        android:text="Berikut update kasus covid-19 yang terkonfirmasi."
-                        android:textColor="@color/black_main"
-                        android:textSize="14sp"/>
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
@@ -78,121 +63,138 @@
                             android:id="@+id/linear_kasus_informasi"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
+                            android:orientation="vertical"
                             android:gravity="center_vertical|center_horizontal"
                             android:visibility="visible"
                             android:padding="10dp">
 
-                            <com.google.android.material.progressindicator.CircularProgressIndicator
+                            <com.airbnb.lottie.LottieAnimationView
                                 android:id="@+id/progress_covid_informasi"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_horizontal|center_vertical"
-                                android:visibility="visible"
-                                android:indeterminate="true"
-                                app:indicatorColor="@color/colorPrimaryDark"
-                                app:trackThickness="3dp" />
+                                android:layout_width="120dp"
+                                android:layout_height="120dp"
+                                android:scaleType="fitXY"
+                                app:lottie_rawRes="@raw/facemask"
+                                app:lottie_loop="true"
+                                app:lottie_autoPlay="true" />
 
                             <LinearLayout
-                                android:id="@+id/layout_wrapper_kasus"
+                                android:id="@+id/layout_wrapper_top"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:visibility="gone">
 
                                 <LinearLayout
-                                    android:layout_width="120dp"
+                                    android:layout_width="180dp"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
                                     android:gravity="center"
                                     android:orientation="vertical">
 
-                                    <ImageView
-                                        android:layout_width="35dp"
-                                        android:layout_height="35dp"
-                                        android:layout_marginBottom="15dp"
-                                        android:contentDescription="@string/todo"
-                                        android:src="@drawable/positif" />
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical|center_horizontal"
+                                        android:fontFamily="@font/baloobhai_medium"
+                                        android:text="Dalam Perawatan" />
 
                                     <TextView
                                         android:id="@+id/text_positif_informasi"
-                                        android:layout_width="wrap_content"
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginBottom="10dp"
                                         android:fontFamily="@font/baloobhaijan"
-                                        android:textColor="@color/red_pink"
-                                        android:textSize="14sp"
+                                        android:gravity="center_vertical|center_horizontal"
+                                        android:textColor="@color/yellow"
+                                        android:textSize="20sp"
                                         tools:text="104092" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="@font/baloobhai_medium"
-                                        android:text="Positif" />
 
                                 </LinearLayout>
 
                                 <LinearLayout
-                                    android:layout_width="120dp"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
                                     android:gravity="center"
                                     android:orientation="vertical">
 
-                                    <ImageView
-                                        android:layout_width="35dp"
-                                        android:layout_height="35dp"
-                                        android:layout_marginBottom="15dp"
-                                        android:contentDescription="@string/todo"
-                                        android:src="@drawable/sembuh" />
-
                                     <TextView
-                                        android:id="@+id/text_sembuh_informasi"
-                                        android:layout_width="wrap_content"
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginBottom="10dp"
-                                        android:fontFamily="@font/baloobhaijan"
-                                        android:textColor="@color/colorPrimaryDark"
-                                        android:textSize="14sp"
-                                        tools:text="50440" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical|center_horizontal"
                                         android:fontFamily="@font/baloobhai_medium"
                                         android:text="Sembuh" />
 
+                                    <TextView
+                                        android:id="@+id/text_sembuh_informasi"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical|center_horizontal"
+                                        android:fontFamily="@font/baloobhaijan"
+                                        android:textColor="@color/teal_700"
+                                        android:textSize="20sp"
+                                        tools:text="50440" />
+
                                 </LinearLayout>
 
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/layout_wrapper_bottom"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:visibility="gone">
+
                                 <LinearLayout
-                                    android:layout_width="120dp"
+                                    android:layout_width="180dp"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
                                     android:gravity="center"
                                     android:orientation="vertical">
 
-                                    <ImageView
-                                        android:layout_width="35dp"
-                                        android:layout_height="35dp"
-                                        android:layout_marginBottom="15dp"
-                                        android:contentDescription="@string/todo"
-                                        android:src="@drawable/depression" />
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical|center_horizontal"
+                                        android:fontFamily="@font/baloobhai_medium"
+                                        android:text="Meninggal" />
 
                                     <TextView
                                         android:id="@+id/text_meninggal_informasi"
-                                        android:layout_width="wrap_content"
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginBottom="10dp"
+                                        android:gravity="center_vertical|center_horizontal"
                                         android:fontFamily="@font/baloobhaijan"
-                                        android:textColor="@color/colorAccent"
-                                        android:textSize="14sp"
+                                        android:textColor="@color/red_pink"
+                                        android:textSize="20sp"
                                         tools:text="90370" />
 
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+
                                     <TextView
-                                        android:layout_width="wrap_content"
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
+                                        android:gravity="center_vertical|center_horizontal"
                                         android:fontFamily="@font/baloobhai_medium"
-                                        android:text="Meninggal" />
+                                        android:text="Terkonfirmasi" />
+
+                                    <TextView
+                                        android:id="@+id/text_konfirmasi_informasi"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical|center_horizontal"
+                                        android:fontFamily="@font/baloobhaijan"
+                                        android:textColor="@color/yellow"
+                                        android:textSize="20sp"
+                                        tools:text="50440" />
+
                                 </LinearLayout>
                             </LinearLayout>
 
@@ -202,21 +204,15 @@
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="@dimen/spacer_normal"
+                        android:layout_height="5dp"
                         android:background="#E0E0E0"
-                        android:layout_marginStart="@dimen/spacer_normal"
-                        android:layout_marginEnd="@dimen/spacer_normal"
+                        android:layout_marginTop="20dp"
                         android:orientation="vertical" />
 
                     <LinearLayout
                         android:id="@+id/layout_item_informasi"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/spacer_normal"
-                        android:layout_marginEnd="@dimen/spacer_normal"
-                        android:layout_marginBottom="90dp"
-                        android:layout_marginTop="@dimen/spacer_small"
                         android:background="@drawable/card"
                         android:orientation="vertical">
 
@@ -230,9 +226,7 @@
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:gravity="center"
+                                android:layout_height="match_parent"
                                 android:orientation="vertical">
 
                                 <TextView
@@ -253,23 +247,23 @@
                                     android:textColor="@color/black_main"
                                     android:textSize="16sp" />
 
-                                <com.google.android.material.progressindicator.CircularProgressIndicator
+                                <com.airbnb.lottie.LottieAnimationView
                                     android:id="@+id/progress_informasi"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:layout_marginTop="10dp"
+                                    android:layout_width="120dp"
+                                    android:layout_height="120dp"
+                                    android:layout_gravity="center_horizontal|center_vertical"
                                     android:visibility="gone"
-                                    android:indeterminate="true"
-                                    app:indicatorColor="@color/colorPrimaryDark"
-                                    app:trackThickness="3dp" />
+                                    android:scaleType="fitXY"
+                                    app:lottie_rawRes="@raw/facemask"
+                                    app:lottie_loop="true"
+                                    app:lottie_autoPlay="true" />
 
                                 <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/recycle_informasi"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="10dp"
-                                    android:visibility="gone"
+                                    android:visibility="visible"
                                     tools:listitem="@layout/view_item_informasi" />
 
                             </LinearLayout>

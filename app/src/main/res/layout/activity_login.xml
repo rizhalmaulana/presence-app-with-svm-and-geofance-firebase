@@ -92,17 +92,15 @@
             android:layout_marginEnd="@dimen/activity_vertical_margin"
             android:orientation="vertical">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_masuk"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginBottom="10dp"
+                android:layout_height="60dp"
                 android:text="Masuk"
-                android:gravity="center_horizontal|center_vertical"
-                android:background="@drawable/button_save"
-                android:textColor="@color/white"
+                android:textColor="@color/colorPrimaryDark"
                 android:fontFamily="@font/baloobhai_medium"
-                android:textSize="14sp" />
+                android:layout_marginBottom="@dimen/spacer_small"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
 <!--            <com.google.android.material.button.MaterialButton-->
 <!--                android:id="@+id/btn_google_login"-->

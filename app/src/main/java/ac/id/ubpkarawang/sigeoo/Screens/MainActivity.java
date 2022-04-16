@@ -59,12 +59,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPermissionsChecked(MultiplePermissionsReport report) {
                 if (report.areAllPermissionsGranted()) {
-                    Toast.makeText(MainActivity.this, "Izin akses aplikasi berhasil", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(MainActivity.this, "Izin akses aplikasi berhasil", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Permission Manifest: Berhasil");
                 }
 
                 if (report.isAnyPermissionPermanentlyDenied()) {
-                    Toast.makeText(MainActivity.this, "Izin akses aplikasi ditolak", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "onPermissionsChecked: " + report.getDeniedPermissionResponses());
+//                    Toast.makeText(MainActivity.this, "Izin akses aplikasi ditolak", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Permission Manifest: Ditolak");
                 }
             }
 
@@ -73,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
                 token.continuePermissionRequest();
             }
         }).withErrorListener(error -> {
-            Toast.makeText(MainActivity.this, "Terjadi masalah " + error.toString(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(MainActivity.this, "Terjadi masalah " + error.toString(), Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Permission Manifest: Terjadi Masalah");
         }).check();
 
         viewPager = findViewById(R.id.vp1);
@@ -148,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onManagerConnected(int status) {
             if (status == LoaderCallbackInterface.SUCCESS) {
-                Log.i(TAG, "OpenCV loaded successfully");
+                Log.d(TAG, "Status OpenCV: Sukses diload");
             } else {
                 super.onManagerConnected(status);
             }
