@@ -1,29 +1,29 @@
 -- Merging decision tree log ---
 manifest
-ADDED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml:2:1-7:12
-INJECTED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml:2:1-7:12
-INJECTED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml:2:1-7:12
+ADDED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml:2:1-7:12
+INJECTED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml:2:1-7:12
+INJECTED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml:2:1-7:12
 	package
-		ADDED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml:3:7-27
-		INJECTED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
-		INJECTED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
+		ADDED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml:3:7-27
+		INJECTED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml
+		INJECTED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml
 	android:versionName
-		ADDED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml:5:7-35
+		ADDED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml:5:7-35
 	xmlns:android
-		ADDED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml:2:11-69
+		ADDED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml:2:11-69
 	android:versionCode
-		ADDED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml:4:7-34
+		ADDED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml:4:7-34
 uses-sdk
-INJECTED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
-INJECTED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
-INJECTED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
-INJECTED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
+INJECTED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml
+INJECTED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml
+INJECTED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml
+INJECTED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml
 	android:targetSdkVersion
-		INJECTED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
-		ADDED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
-		INJECTED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
+		INJECTED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml
+		ADDED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml
+		INJECTED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
-		ADDED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
-		INJECTED from D:\AndroidStudioProject\presence-app-with-svm-and-geofance-firebase\openCVLibrary3414\src\main\AndroidManifest.xml
+		INJECTED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml
+		ADDED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml
+		INJECTED from /Users/muhamadrizalmaulana/AndroidStudioProjects/presence-app-with-svm-and-geofance-firebase/openCVLibrary3414/src/main/AndroidManifest.xml

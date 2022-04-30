@@ -7,10 +7,9 @@
     android:background="@drawable/flip_boarding_background"
     tools:context=".Screens.utama.UtamaFragment">
 
-    <include
-        android:id="@+id/fragment_sigeoo_toolbar"
+    <include android:id="@+id/fragment_sigeoo_toolbar"
         layout="@layout/view_topbar_sigeoo" />
 
-    <include layout="@layout/menu_layout" />
+    <include layout="@layout/menu_utama_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

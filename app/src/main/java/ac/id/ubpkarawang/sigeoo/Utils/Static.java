@@ -3,11 +3,14 @@ package ac.id.ubpkarawang.sigeoo.Utils;
 public class Static {
     public final static String MyPref = "my_pref";
 
-    public final static String LOCALURL = "http://192.168.109.93/api-rupadi";
+    public final static String LOCALURL = "http://192.168.3.104:8080";
+    public final static String LOCALURL_DEV = "http://10.0.2.2:8080";
 
     public final static String SERVERURL = "https://rupadi.clikini.com";
 
     public final static String BASE_URL = LOCALURL+"/api/";
+
+    public final static String STORAGE_BANNER_API = LOCALURL+"/assets/banner/";
 
     public final static String STORAGE_BANNER = SERVERURL+"/public/banner/";
     public final static String STORAGE_PRODUK = SERVERURL+"/public/foto-brg/";

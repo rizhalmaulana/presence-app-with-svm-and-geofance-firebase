@@ -100,7 +100,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         turnOnGPS();
                         buildLocationManager();
-                        buildLoactionCallback();
+                        buildLocationCallback();
                         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MapsActivity.this);
 
                         initArea();
@@ -196,7 +196,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         geoFire = new GeoFire(myLocationRef);
     }
 
-    private void buildLoactionCallback() {
+    private void buildLocationCallback() {
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull @NotNull LocationResult locationResult) {

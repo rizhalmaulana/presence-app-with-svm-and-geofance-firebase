@@ -13,13 +13,18 @@ android {
         targetSdkVersion 31
         versionCode 1
         versionName "1.0"
-//        applicationId "opencv.org"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        Properties properties = new Properties()
+
+        properties.load(project.rootProject.file('gradle.properties').newDataInputStream())
+        manifestPlaceholders = [apiKey: "${properties.getProperty('apiKey')}"]
     }
 
     buildTypes {
         release {
+            debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -52,7 +57,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
 
-    implementation platform('com.google.firebase:firebase-bom:29.2.0')
+    implementation platform('com.google.firebase:firebase-bom:29.3.1')
     implementation 'com.google.firebase:firebase-analytics'
 
     implementation 'com.google.firebase:firebase-auth:21.0.2'
@@ -73,9 +78,11 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.6'
-    implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.6'
-    implementation 'com.squareup.okhttp3:okhttp-urlconnection:5.0.0-alpha.6'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
+    implementation 'com.squareup.okhttp3:okhttp-urlconnection:4.9.3'
+
+    implementation 'com.github.dhaval2404:imagepicker:2.1'
 
     implementation 'com.amitshekhar.android:android-networking:1.0.2'
     implementation 'com.afollestad.material-dialogs:core:3.3.0'

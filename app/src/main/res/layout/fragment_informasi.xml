@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/boarding_background"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/boarding_background"
     tools:context=".Screens.informasi.InformasiFragment">
+
+    <include
+        android:id="@+id/view_load"
+        layout="@layout/view_loading" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/layout_refresh_kategori"
@@ -24,11 +28,14 @@
                     android:id="@+id/layout_card_corona"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="@color/white"
                     android:orientation="vertical">
 
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/card_fill_banenr"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:visibility="gone"
                         app:cardBackgroundColor="@color/white">
 
                         <ImageView
@@ -39,16 +46,31 @@
 
                     </androidx.cardview.widget.CardView>
 
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycle_banner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:listitem="@layout/view_item_banner" />
+
+                    <ru.tinkoff.scrollingpagerindicator.ScrollingPagerIndicator
+                        android:id="@+id/indicator_banner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacer_small"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        app:spi_dotColor="@color/black_sub"
+                        app:spi_orientation="horizontal" />
+
                     <TextView
                         android:id="@+id/textKasusCovid"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="16dp"
-                        android:visibility="visible"
                         android:fontFamily="@font/baloobhaijan"
                         android:text="Jumlah kasus di Indonesia saat ini."
                         android:textColor="@color/colorPrimaryDark"
-                        android:textSize="20sp" />
+                        android:textSize="20sp"
+                        android:visibility="visible" />
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
@@ -63,26 +85,15 @@
                             android:id="@+id/linear_kasus_informasi"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
                             android:gravity="center_vertical|center_horizontal"
-                            android:visibility="visible"
-                            android:padding="10dp">
-
-                            <com.airbnb.lottie.LottieAnimationView
-                                android:id="@+id/progress_covid_informasi"
-                                android:layout_width="120dp"
-                                android:layout_height="120dp"
-                                android:scaleType="fitXY"
-                                app:lottie_rawRes="@raw/facemask"
-                                app:lottie_loop="true"
-                                app:lottie_autoPlay="true" />
+                            android:orientation="vertical"
+                            android:padding="10dp"
+                            android:visibility="visible">
 
                             <LinearLayout
-                                android:id="@+id/layout_wrapper_top"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:visibility="gone">
+                                android:orientation="horizontal">
 
                                 <LinearLayout
                                     android:layout_width="180dp"
@@ -94,8 +105,8 @@
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:gravity="center_vertical|center_horizontal"
                                         android:fontFamily="@font/baloobhai_medium"
+                                        android:gravity="center_vertical|center_horizontal"
                                         android:text="Dalam Perawatan" />
 
                                     <TextView
@@ -120,16 +131,16 @@
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:gravity="center_vertical|center_horizontal"
                                         android:fontFamily="@font/baloobhai_medium"
+                                        android:gravity="center_vertical|center_horizontal"
                                         android:text="Sembuh" />
 
                                     <TextView
                                         android:id="@+id/text_sembuh_informasi"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:gravity="center_vertical|center_horizontal"
                                         android:fontFamily="@font/baloobhaijan"
+                                        android:gravity="center_vertical|center_horizontal"
                                         android:textColor="@color/teal_700"
                                         android:textSize="20sp"
                                         tools:text="50440" />
@@ -139,11 +150,9 @@
                             </LinearLayout>
 
                             <LinearLayout
-                                android:id="@+id/layout_wrapper_bottom"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:visibility="gone">
+                                android:orientation="horizontal">
 
                                 <LinearLayout
                                     android:layout_width="180dp"
@@ -155,16 +164,16 @@
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:gravity="center_vertical|center_horizontal"
                                         android:fontFamily="@font/baloobhai_medium"
+                                        android:gravity="center_vertical|center_horizontal"
                                         android:text="Meninggal" />
 
                                     <TextView
                                         android:id="@+id/text_meninggal_informasi"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:gravity="center_vertical|center_horizontal"
                                         android:fontFamily="@font/baloobhaijan"
+                                        android:gravity="center_vertical|center_horizontal"
                                         android:textColor="@color/red_pink"
                                         android:textSize="20sp"
                                         tools:text="90370" />
@@ -181,16 +190,16 @@
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:gravity="center_vertical|center_horizontal"
                                         android:fontFamily="@font/baloobhai_medium"
+                                        android:gravity="center_vertical|center_horizontal"
                                         android:text="Terkonfirmasi" />
 
                                     <TextView
                                         android:id="@+id/text_konfirmasi_informasi"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:gravity="center_vertical|center_horizontal"
                                         android:fontFamily="@font/baloobhaijan"
+                                        android:gravity="center_vertical|center_horizontal"
                                         android:textColor="@color/yellow"
                                         android:textSize="20sp"
                                         tools:text="50440" />
@@ -205,8 +214,8 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="5dp"
-                        android:background="#E0E0E0"
                         android:layout_marginTop="20dp"
+                        android:background="#E0E0E0"
                         android:orientation="vertical" />
 
                     <LinearLayout
@@ -220,53 +229,42 @@
                             android:id="@+id/menu_informasi"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:visibility="visible"
-                            android:padding="10dp">
+                            android:orientation="vertical"
+                            android:padding="10dp"
+                            android:visibility="visible">
 
-                            <LinearLayout
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:fontFamily="@font/baloobhaijan"
+                                android:text="Informasi terkini"
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textSize="20sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:fontFamily="@font/baloobhai_medium"
+                                android:text="Dapatkan informasi terupdate di aplikasi Sigeoo."
+                                android:textColor="@color/black_main"
+                                android:textSize="16sp" />
+
+                            <ScrollView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:layout_marginBottom="40dp"
                                 android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/baloobhaijan"
-                                    android:layout_marginTop="10dp"
-                                    android:text="Informasi terkini"
-                                    android:textColor="@color/colorPrimaryDark"
-                                    android:textSize="20sp" />
-
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/baloobhai_medium"
-                                    android:text="Dapatkan informasi terupdate di aplikasi Sigeoo."
-                                    android:layout_marginTop="5dp"
-                                    android:textColor="@color/black_main"
-                                    android:textSize="16sp" />
-
-                                <com.airbnb.lottie.LottieAnimationView
-                                    android:id="@+id/progress_informasi"
-                                    android:layout_width="120dp"
-                                    android:layout_height="120dp"
-                                    android:layout_gravity="center_horizontal|center_vertical"
-                                    android:visibility="gone"
-                                    android:scaleType="fitXY"
-                                    app:lottie_rawRes="@raw/facemask"
-                                    app:lottie_loop="true"
-                                    app:lottie_autoPlay="true" />
 
                                 <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/recycle_informasi"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="10dp"
-                                    android:visibility="visible"
                                     tools:listitem="@layout/view_item_informasi" />
 
-                            </LinearLayout>
+                            </ScrollView>
 
                         </LinearLayout>
 

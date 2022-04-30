@@ -68,4 +68,10 @@
     <string name="no_19">19. Saya Jarang minum vitamin C dan E dan kurang Tidur</string>
     <string name="no_20">20. Usia saya diatas 60 tahun</string>
     <string name="no_21">21. Saya mempunyai penyakit : jantung/diabetes/gangguan pernafasan kronik</string>
+    <string name="test_resiko_covid_19">TEST RESIKO COVID-19</string>
+    <string name="mari_tandai_kegiatan_anda_untuk_bersatu_melawan_penyebaran_covid_19">MARI TANDAI KEGIATAN ANDA, UNTUK BERSATU MELAWAN PENYEBARAN COVID-19</string>
+    <string name="a_potensi_tertular_diluar_rumah">A. POTENSI TERTULAR DILUAR RUMAH</string>
+    <string name="title_activity_geofence">GeofenceActivity</string>
+    <string name="masuk_dengan_google">Masuk dengan google</string>
+    <string name="lokasi_saat_ini">Lokasi Saat Ini</string>
 </resources>

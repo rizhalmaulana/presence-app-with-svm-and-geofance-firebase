@@ -7,6 +7,7 @@ public class Banner {
 
     private String id;
     private String foto_banner;
+    private String deskripsi_banner;
     private String author_banner;
     private String created_at;
 
@@ -24,6 +25,14 @@ public class Banner {
 
     public void setFoto_banner(String foto_banner) {
         this.foto_banner = foto_banner;
+    }
+
+    public String getDeskripsi_banner() {
+        return deskripsi_banner;
+    }
+
+    public void setDeskripsi_banner(String deskripsi_banner) {
+        this.deskripsi_banner = deskripsi_banner;
     }
 
     public String getAuthor_banner() {

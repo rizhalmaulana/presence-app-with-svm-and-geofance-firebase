@@ -8,26 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:359655609071:android:137b1243b4d130d8ca411a",
+        "mobilesdk_app_id": "1:359655609071:android:f322c70ab3a11172ca411a",
         "android_client_info": {
           "package_name": "ac.id.ubpkarawang.sigeoo"
         }
       },
       "oauth_client": [
         {
-          "client_id": "359655609071-1mc7elp4j0dnsifanghns3g99d9n72ko.apps.googleusercontent.com",
+          "client_id": "359655609071-p5vto9guesqv84d6glktjjbl2vltbr49.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "ac.id.ubpkarawang.sigeoo",
-            "certificate_hash": "b11cf5c22f637d988e10f9f4a4274fc78cbf537c"
-          }
-        },
-        {
-          "client_id": "359655609071-kvituccr31em48q7k9mh78kekj530em5.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "ac.id.ubpkarawang.sigeoo",
-            "certificate_hash": "11668ff3f43df7d82b6308f3c7f3fca525d5b2fc"
+            "certificate_hash": "8878cfb792298cf618c6621e832af1c46793095e"
           }
         },
         {
@@ -37,7 +29,10 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBM2ZkgFQ5sikxRu5A0okBlTZMTyrdM1H0"
+          "current_key": "AIzaSyDRghiK85xwmXda07OCSFP4lxHmMBhN4SM"
+        },
+        {
+          "current_key": "AIzaSyB8D14XveiuxacapxNmK50P2PCH47YXhkU"
         }
       ],
       "services": {
@@ -66,7 +61,10 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBM2ZkgFQ5sikxRu5A0okBlTZMTyrdM1H0"
+          "current_key": "AIzaSyDRghiK85xwmXda07OCSFP4lxHmMBhN4SM"
+        },
+        {
+          "current_key": "AIzaSyB8D14XveiuxacapxNmK50P2PCH47YXhkU"
         }
       ],
       "services": {

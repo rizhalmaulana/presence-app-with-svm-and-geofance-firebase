@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet"
@@ -9,33 +8,119 @@
     android:layout_height="wrap_content"
     android:padding="10dp">
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="50dp"
-        android:padding="@dimen/spacer_small">
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="@dimen/spacer_small"
+        app:cardBackgroundColor="@android:color/white"
+        app:cardCornerRadius="8dp">
 
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/progress_banner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="30dp"
-            android:visibility="invisible"
-            android:indeterminate="true"
-            app:indicatorColor="@color/colorPrimaryDark"
-            app:trackThickness="3dp" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycle_banner"
+        <LinearLayout
+            android:id="@+id/linear_board_jam"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:listitem="@layout/view_item_banner"
-            android:layout_margin="@dimen/spacer_small" />
+            android:orientation="vertical"
+            android:gravity="center_vertical|center_horizontal"
+            android:visibility="visible"
+            android:padding="10dp">
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="180dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:fontFamily="@font/baloobhai_medium"
+                        android:text="Jam Masuk" />
+
+                    <TextView
+                        android:id="@+id/text_jam_masuk"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/baloobhaijan"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="20sp"
+                        android:text="08:00" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:fontFamily="@font/baloobhai_medium"
+                        android:text="Jam Pulang" />
+
+                    <TextView
+                        android:id="@+id/text_jam_pulang"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:fontFamily="@font/baloobhaijan"
+                        android:textColor="@color/yellow"
+                        android:textSize="20sp"
+                        android:text="16:00" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacer_small"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:fontFamily="@font/baloobhai_medium"
+                        android:text="@string/lokasi_saat_ini" />
+
+                    <TextView
+                        android:id="@+id/txt_lokasi_sekarang"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/baloobhaijan"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:textColor="@color/black_sub"
+                        android:textSize="12sp"
+                        android:text="Kec. Telukjambe Tim., Kabupaten Karawang, Jawa Barat Kabupaten Karawang, Jawa Barat" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -52,32 +137,20 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp" >
-
-            <ImageView
-                android:id="@+id/imageView4"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="300dp"
-                android:src="@drawable/coronavirus"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="wrap_content" >
 
             <TextView
                 android:id="@+id/textView3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="150dp"
                 android:layout_marginBottom="20dp"
+                android:layout_marginStart="20dp"
                 android:fontFamily="@font/baloobhai_bold"
                 android:text="CHECK COVID-19"
                 android:textColor="@color/black_main"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageView4"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
@@ -97,12 +170,11 @@
                 android:id="@+id/cv_periksa"
                 android:layout_width="70dp"
                 android:layout_height="35dp"
+                android:layout_marginEnd="20dp"
                 app:cardBackgroundColor="@color/colorPrimary"
                 app:cardCornerRadius="3dp"
-                android:layout_marginStart="245dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
@@ -247,7 +319,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/lr_jadwal"
+                android:id="@+id/lr_riwayat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -259,7 +331,7 @@
                 tools:ignore="UseCompoundDrawables">
 
                 <ImageView
-                    android:id="@+id/ivTrip"
+                    android:id="@+id/ivRiwayat"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
                     android:layout_gravity="center_vertical|center_horizontal"
@@ -267,48 +339,13 @@
                     app:srcCompat="@drawable/jadwal" />
 
                 <TextView
-                    android:id="@+id/tvJadwal"
+                    android:id="@+id/tvRiwayat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/baloobhai_medium"
                     android:gravity="center_horizontal"
                     android:paddingTop="6dp"
-                    android:text="Jadwal"
-                    android:textAlignment="center"
-                    android:textColor="@color/black_main"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/lr_keloladata"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:orientation="vertical"
-                android:padding="16dp"
-                tools:ignore="UseCompoundDrawables">
-
-                <ImageView
-                    android:id="@+id/ivKelola"
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    android:contentDescription="@string/todo"
-                    app:srcCompat="@drawable/verification" />
-
-                <TextView
-                    android:id="@+id/tvKelola"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/baloobhai_medium"
-                    android:gravity="center_horizontal"
-                    android:paddingTop="6dp"
-                    android:text="Kelola Data"
+                    android:text="Riwayat Absen"
                     android:textAlignment="center"
                     android:textColor="@color/black_main"
                     android:textSize="12sp"
@@ -350,6 +387,43 @@
                     android:textStyle="bold" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lr_keloladata"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="invisible"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:id="@+id/ivKelola"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical|center_horizontal"
+                    android:contentDescription="@string/todo"
+                    app:srcCompat="@drawable/verification" />
+
+                <TextView
+                    android:id="@+id/tvKelola"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/baloobhai_medium"
+                    android:gravity="center_horizontal"
+                    android:paddingTop="6dp"
+                    android:text="Kelola Data"
+                    android:textAlignment="center"
+                    android:textColor="@color/black_main"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 

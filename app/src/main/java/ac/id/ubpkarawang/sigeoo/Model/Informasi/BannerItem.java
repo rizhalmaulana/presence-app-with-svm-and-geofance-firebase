@@ -4,18 +4,18 @@ import java.util.List;
 
 public class BannerItem {
 
-    List<Banner> dataBanner;
+    List<Banner> data;
     boolean state;
 
-    public BannerItem() {
+    public BannerItem(){
+
+    }
+    public List<Banner> getData() {
+        return data;
     }
 
-    public List<Banner> getDataBanner() {
-        return dataBanner;
-    }
-
-    public void setDataBanner(List<Banner> dataBanner) {
-        this.dataBanner = dataBanner;
+    public void setData(List<Banner> data) {
+        this.data = data;
     }
 
     public boolean isState() {

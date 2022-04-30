@@ -59,13 +59,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPermissionsChecked(MultiplePermissionsReport report) {
                 if (report.areAllPermissionsGranted()) {
-//                    Toast.makeText(MainActivity.this, "Izin akses aplikasi berhasil", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "Permission Manifest: Berhasil");
+                    Log.d(TAG, "Permission Manifest: Berhasil" + report.getGrantedPermissionResponses());
                 }
 
                 if (report.isAnyPermissionPermanentlyDenied()) {
-//                    Toast.makeText(MainActivity.this, "Izin akses aplikasi ditolak", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "Permission Manifest: Ditolak");
+                    Log.d(TAG, "Permission Manifest: Ditolak" + report.getDeniedPermissionResponses());
                 }
             }
 
@@ -73,10 +71,7 @@ public class MainActivity extends AppCompatActivity {
             public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
                 token.continuePermissionRequest();
             }
-        }).withErrorListener(error -> {
-//            Toast.makeText(MainActivity.this, "Terjadi masalah " + error.toString(), Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Permission Manifest: Terjadi Masalah");
-        }).check();
+        }).withErrorListener(error -> Log.d(TAG, "Permission Manifest: Terjadi Masalah" + error.toString())).check();
 
         viewPager = findViewById(R.id.vp1);
         bottomNavigationView = findViewById(R.id.nav_view);
@@ -111,7 +106,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     bottomNavigationView.getMenu().getItem(0).setChecked(false);
                 }
-                Log.d("page", "" + position);
+
+                Log.d("Status page", "" + position);
                 bottomNavigationView.getMenu().getItem(position).setChecked(true);
                 prevMenuItem = bottomNavigationView.getMenu().getItem(position);
             }

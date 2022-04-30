@@ -102,47 +102,21 @@
                 android:layout_marginBottom="@dimen/spacer_small"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
-<!--            <com.google.android.material.button.MaterialButton-->
-<!--                android:id="@+id/btn_google_login"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="60dp"-->
-<!--                android:text="Masuk dengan google"-->
-<!--                android:textColor="@color/red_pink"-->
-<!--                android:fontFamily="@font/baloobhai_medium"-->
-<!--                app:icon="@drawable/ic_google"-->
-<!--                app:iconTint="@color/red_pink"-->
-<!--                app:iconSize="24dp"-->
-<!--                android:layout_marginBottom="@dimen/spacer_small"-->
-<!--                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>-->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_google_login"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="@string/masuk_dengan_google"
+                android:textColor="@color/white"
+                android:fontFamily="@font/baloobhai_medium"
+                android:layout_marginBottom="@dimen/spacer_small"
+                app:backgroundTint="@color/colorPrimary"
+                app:icon="@drawable/ic_google"
+                app:iconTint="@color/white"
+                app:iconSize="24dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
         </LinearLayout>
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="@dimen/activity_vertical_margin"-->
-<!--            android:layout_marginEnd="@dimen/activity_vertical_margin"-->
-<!--            android:gravity="center_vertical|center_horizontal"-->
-<!--            android:orientation="horizontal">-->
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:fontFamily="@font/baloobhai_regular"-->
-<!--                android:text="Belum punya akun Rupadi? "-->
-<!--                android:textColor="#181725"-->
-<!--                android:textSize="16sp" />-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/text_daftar"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:fontFamily="@font/baloobhai_regular"-->
-<!--                android:text="Daftar"-->
-<!--                android:textColor="@color/colorPrimaryDark"-->
-<!--                android:textSize="16sp" />-->
-
-<!--        </LinearLayout>-->
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
