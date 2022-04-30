@@ -1,15 +1,21 @@
 package ac.id.ubpkarawang.sigeoo.Screens.utama;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,11 +29,23 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -46,6 +64,9 @@ public class UtamaFragment extends Fragment implements LocationListener {
     MaterialButton bs_absen_masuk;
     LinearLayout lrMaps, lrKeluar, lrMasuk, lrAbsenMasuk;
     TextView lokasi_sekarang;
+    Geocoder geocoder;
+
+    private LocationRequest locationRequest;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,9 +94,15 @@ public class UtamaFragment extends Fragment implements LocationListener {
         bs_absen_masuk = sheetMasuk.findViewById(R.id.btn_bs_absen_masuk);
         lrAbsenMasuk = sheetMasuk.findViewById(R.id.lr_bs_absen_masuk);
 
+        locationRequest = com.google.android.gms.location.LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(2000);
+
+        getCurrentLocation();
+
         lrMasuk.setOnClickListener(view4 -> {
             bottomSheetDialog.setContentView(sheetMasuk);
-            bottomSheetDialog.setCancelable(false);
             bottomSheetDialog.setCanceledOnTouchOutside(false);
             bottomSheetDialog.show();
 
@@ -93,29 +120,128 @@ public class UtamaFragment extends Fragment implements LocationListener {
         });
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == ConstantKey.CAMERA_REQUEST_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "Permission Granted");
+    private void getCurrentLocation() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+                if (isGPSEnabled()) {
+
+                    LocationServices.getFusedLocationProviderClient(getActivity())
+                            .requestLocationUpdates(locationRequest, new LocationCallback() {
+                                @Override
+                                public void onLocationResult(@NonNull LocationResult locationResult) {
+                                    super.onLocationResult(locationResult);
+
+                                    LocationServices.getFusedLocationProviderClient(getActivity()).removeLocationUpdates(this);
+
+                                    if (locationResult != null && locationResult.getLocations().size() > 0) {
+
+                                        int index = locationResult.getLocations().size() - 1;
+                                        double latitude = locationResult.getLocations().get(index).getLatitude();
+                                        double longitude = locationResult.getLocations().get(index).getLongitude();
+
+                                        geocoder = new Geocoder(getContext(), Locale.getDefault());
+                                        try {
+                                            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                                            lokasi_sekarang.setText(addresses.get(0).getAddressLine(0));
+                                        } catch (IOException exception) {
+                                            exception.printStackTrace();
+                                        }
+                                    }
+                                }
+                            }, Looper.getMainLooper());
+
+                } else {
+                    turnOnGPS();
+                }
+
             } else {
-                Log.d(TAG, "Permission Denied");
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             }
         }
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "Permission Granted");
+                if (isGPSEnabled()) {
+                    getCurrentLocation();
+                } else {
+                    turnOnGPS();
+                }
+            }
+        }
+    }
+
+    private void turnOnGPS() {
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true);
+
+        Task<LocationSettingsResponse> result = LocationServices.getSettingsClient(getContext())
+                .checkLocationSettings(builder.build());
+
+        result.addOnCompleteListener(task -> {
+
+            try {
+                LocationSettingsResponse response = task.getResult(ApiException.class);
+                Toast.makeText(getContext(), "GPS berhasil diaktifkan.", Toast.LENGTH_SHORT).show();
+
+            } catch (ApiException e) {
+
+                switch (e.getStatusCode()) {
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+
+                        try {
+                            ResolvableApiException resolvableApiException = (ResolvableApiException) e;
+                            resolvableApiException.startResolutionForResult(getActivity(), 2);
+                        } catch (IntentSender.SendIntentException ex) {
+                            ex.printStackTrace();
+                        }
+                        break;
+
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        //Device does not have location
+                        break;
+                }
+            }
+        });
+
+    }
+
+    private boolean isGPSEnabled() {
+        LocationManager locationManager = null;
+        boolean isEnabled = false;
+
+        if (locationManager == null) {
+            locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        }
+
+        isEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        return isEnabled;
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ConstantKey.CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Bitmap photoAbsen = (Bitmap) data.getExtras().get("data");
-            img_masuk.setImageBitmap(photoAbsen);
+        if (resultCode == Activity.RESULT_OK) {
 
-            bs_absen_masuk.setEnabled(true);
-            bs_absen_masuk.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-            bs_absen_masuk.setTextColor(getResources().getColor(R.color.white));
+            if (requestCode == 2) {
+                getCurrentLocation();
+            }
 
-            bs_absen_masuk.setOnClickListener(view -> absenMasuk());
+            if (requestCode == ConstantKey.CAMERA_REQUEST_CODE) {
+                Bitmap photoAbsen = (Bitmap) data.getExtras().get("data");
+                img_masuk.setImageBitmap(photoAbsen);
+
+                bs_absen_masuk.setEnabled(true);
+                bs_absen_masuk.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                bs_absen_masuk.setTextColor(getResources().getColor(R.color.white));
+
+                bs_absen_masuk.setOnClickListener(view -> absenMasuk());
+            }
         }
     }
 

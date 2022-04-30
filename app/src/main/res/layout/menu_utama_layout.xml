@@ -112,7 +112,7 @@
                         android:gravity="center_vertical|center_horizontal"
                         android:textColor="@color/black_sub"
                         android:textSize="12sp"
-                        android:text="Kec. Telukjambe Tim., Kabupaten Karawang, Jawa Barat Kabupaten Karawang, Jawa Barat" />
+                        android:text="Testing Alamat Sekarang" />
 
                 </LinearLayout>
 
