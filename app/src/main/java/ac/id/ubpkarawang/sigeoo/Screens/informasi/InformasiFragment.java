@@ -99,7 +99,7 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
         recycle_informasi = view.findViewById(R.id.recycle_informasi);
         recycle_banner = view.findViewById(R.id.recycle_banner);
 
-        refresh_informasi = view.findViewById(R.id.layout_refresh_kategori);
+        refresh_informasi = view.findViewById(R.id.layout_refresh_informasi);
         refresh_informasi.setOnRefreshListener(this);
 
         recycle_informasi.setHasFixedSize(true);
@@ -111,54 +111,6 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
         recycle_banner.setLayoutManager(layoutBanner);
 
         loadInformasi();
-    }
-
-    private void loadBanner() {
-        Call<BannerItem> dataBanner = ApiRetrofitClient.service().getbanner();
-        dataBanner.enqueue(new Callback<BannerItem>() {
-            @Override
-            public void onResponse(@NonNull Call<BannerItem> call, @NonNull Response<BannerItem> response) {
-                BannerItem body = response.body();
-                if (response.isSuccessful()){
-                    assert body != null;
-                    if (!body.isState()){
-                        initialize();
-                        ArrayList<Banner> bannerList = new ArrayList<>();
-                        BannerAdapter bannerAdapter = new BannerAdapter(getContext(), bannerList);
-                        recycle_banner.setAdapter(bannerAdapter);
-
-                        recycle_banner.setVisibility(View.GONE);
-                        card_banner.setVisibility(View.VISIBLE);
-
-                    } else {
-                        Log.d(TAG, "Status data banner: " + body.getData());
-                        initialize();
-                        for (int i = 0; i < body.getData().size(); i++){
-                            final Banner itemBanner = new Banner();
-                            itemBanner.setFoto_banner(body.getData().get(i).getFoto_banner());
-                            listBanner.add(itemBanner);
-                        }
-
-                        BannerAdapter bannerAdapter = new BannerAdapter(getContext(), listBanner);
-                        recycle_banner.setAdapter(bannerAdapter);
-                        recycle_indicator.attachToRecyclerView(recycle_banner);
-                        recycle_banner.setVisibility(View.VISIBLE);
-                        card_banner.setVisibility(View.GONE);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<BannerItem> call, @NonNull Throwable t) {
-                Log.d(TAG, "Status Banner: " + t);
-
-                recycle_banner.setVisibility(View.GONE);
-                card_banner.setVisibility(View.VISIBLE);
-
-                Toast.makeText(getContext(), "Gagal load banner! Coba lagi", Toast.LENGTH_SHORT).show();
-            }
-        });
-
     }
 
     private void loadInformasi() {
@@ -222,6 +174,55 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
         });
     }
 
+
+    private void loadBanner() {
+        Call<BannerItem> dataBanner = ApiRetrofitClient.service().getbanner();
+        dataBanner.enqueue(new Callback<BannerItem>() {
+            @Override
+            public void onResponse(@NonNull Call<BannerItem> call, @NonNull Response<BannerItem> response) {
+                BannerItem body = response.body();
+                if (response.isSuccessful()){
+                    assert body != null;
+                    if (!body.isState()){
+                        initialize();
+                        ArrayList<Banner> bannerList = new ArrayList<>();
+                        BannerAdapter bannerAdapter = new BannerAdapter(getContext(), bannerList);
+                        recycle_banner.setAdapter(bannerAdapter);
+
+                        recycle_banner.setVisibility(View.GONE);
+                        card_banner.setVisibility(View.VISIBLE);
+
+                    } else {
+                        Log.d(TAG, "Status data banner: " + body.getData());
+                        initialize();
+                        for (int i = 0; i < body.getData().size(); i++){
+                            final Banner itemBanner = new Banner();
+                            itemBanner.setFoto_banner(body.getData().get(i).getFoto_banner());
+                            listBanner.add(itemBanner);
+                        }
+
+                        BannerAdapter bannerAdapter = new BannerAdapter(getContext(), listBanner);
+                        recycle_banner.setAdapter(bannerAdapter);
+                        recycle_indicator.attachToRecyclerView(recycle_banner);
+                        recycle_banner.setVisibility(View.VISIBLE);
+                        card_banner.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<BannerItem> call, @NonNull Throwable t) {
+                Log.d(TAG, "Status Banner: " + t);
+
+                recycle_banner.setVisibility(View.GONE);
+                card_banner.setVisibility(View.VISIBLE);
+
+                Toast.makeText(getContext(), "Gagal load banner! Coba lagi", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
     private void initialize() {
         listBanner = new ArrayList<>();
         BannerAdapter bannerAdapter = new BannerAdapter(getContext(), listBanner);
@@ -235,7 +236,15 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
             loadInformasi();
             loadBanner();
             refresh_informasi.setRefreshing(false);
-        }, 2000);
+        }, 3000);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        loadInformasi();
+        loadBanner();
     }
 
     @Override

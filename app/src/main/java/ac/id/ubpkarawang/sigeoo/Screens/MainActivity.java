@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }).withErrorListener(error -> Log.d(TAG, "Permission Manifest: Terjadi Masalah" + error.toString())).check();
 
-        viewPager = findViewById(R.id.vp1);
+        viewPager = findViewById(R.id.viewpager);
         bottomNavigationView = findViewById(R.id.nav_view);
 
         bottomNavigationView.setOnItemSelectedListener(item -> {

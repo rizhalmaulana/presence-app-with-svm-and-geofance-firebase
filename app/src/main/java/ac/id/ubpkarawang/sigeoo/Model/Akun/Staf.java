@@ -1,63 +1,31 @@
 package ac.id.ubpkarawang.sigeoo.Model.Akun;
 
+import android.net.Uri;
+
+import com.google.gson.annotations.SerializedName;
+
 public class Staf {
-    private String id;
-    private String username;
-    private String nik;
-    private String kk;
-    private String alamat;
-    private String gender;
+    @SerializedName("uid")
+    private String uid;
+
+    @SerializedName("email")
     private String email;
+
+    @SerializedName("phone")
     private String phone;
-    private String latitude;
-    private String longitude;
 
-    public String getId() {
-        return id;
+    @SerializedName("username")
+    private String username;
+
+    @SerializedName("uriPhoto")
+    private Uri uriPhoto;
+
+    public String getUid() {
+        return uid;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getNik() {
-        return nik;
-    }
-
-    public void setNik(String nik) {
-        this.nik = nik;
-    }
-
-    public String getKk() {
-        return kk;
-    }
-
-    public void setKk(String kk) {
-        this.kk = kk;
-    }
-
-    public String getAlamat() {
-        return alamat;
-    }
-
-    public void setAlamat(String alamat) {
-        this.alamat = alamat;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getEmail() {
@@ -76,19 +44,19 @@ public class Staf {
         this.phone = phone;
     }
 
-    public String getLatitude() {
-        return latitude;
+    public String getUsername() {
+        return username;
     }
 
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public String getLongitude() {
-        return longitude;
+    public Uri getUriPhoto() {
+        return uriPhoto;
     }
 
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
+    public void setUriPhoto(Uri uriPhoto) {
+        this.uriPhoto = uriPhoto;
     }
 }

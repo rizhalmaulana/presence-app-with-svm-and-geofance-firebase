@@ -1,30 +1,40 @@
 package ac.id.ubpkarawang.sigeoo.Screens;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.gson.Gson;
 
-import ac.id.ubpkarawang.sigeoo.R;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import ac.id.ubpkarawang.sigeoo.Model.Akun.Staf;
 import ac.id.ubpkarawang.sigeoo.Utils.Preferences;
+import ac.id.ubpkarawang.sigeoo.databinding.ActivityOnboardingBinding;
 
 public class OnboardingActivity extends AppCompatActivity {
 
-    MaterialButton btnLanjutkan;
+    private ActivityOnboardingBinding onboardingBinding;
+    private FirebaseAuth firebaseAuth;
+    private static final String TAG = "OnBoarding";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_onboarding);
+        onboardingBinding = ActivityOnboardingBinding.inflate(getLayoutInflater());
+        setContentView(onboardingBinding.getRoot());
 
-        btnLanjutkan = findViewById(R.id.btn_lanjutkan);
-        btnLanjutkan.setOnClickListener(v -> {
+        firebaseAuth = FirebaseAuth.getInstance();
+        checkUser();
+
+        onboardingBinding.btnLanjutkan.setOnClickListener(v -> {
             if (Preferences.getStaf(getApplicationContext()) != null) {
                 startActivity(new Intent(OnboardingActivity.this, MainActivity.class));
             } else {
@@ -32,5 +42,22 @@ public class OnboardingActivity extends AppCompatActivity {
             }
             finish();
         });
+    }
+
+    private void checkUser() {
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        Staf stafUser = new Gson().fromJson(new Gson().toJson(Preferences.getStaf(getApplicationContext())), Staf.class);
+
+        if (firebaseUser != null) {
+            if (Preferences.getStaf(getApplicationContext()) != null) {
+
+                Log.d(TAG, "OnBoard: " + stafUser.getUsername());
+                Log.d(TAG, "OnBoard Firebase: " + firebaseUser.getDisplayName());
+
+                Toast.makeText(this, "Hai " + firebaseUser.getDisplayName() + ". Welcome!", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+            }
+        }
     }
 }
