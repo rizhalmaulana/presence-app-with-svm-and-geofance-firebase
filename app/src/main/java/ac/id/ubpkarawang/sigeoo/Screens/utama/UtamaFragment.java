@@ -49,17 +49,22 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import ac.id.ubpkarawang.sigeoo.R;
+import ac.id.ubpkarawang.sigeoo.Screens.LoginActivity;
 import ac.id.ubpkarawang.sigeoo.Screens.MapsActivity;
 import ac.id.ubpkarawang.sigeoo.Screens.PeriksaActivity;
 import ac.id.ubpkarawang.sigeoo.Utils.ConstantKey;
+import ac.id.ubpkarawang.sigeoo.Utils.Preferences;
 
 public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, LocationListener {
 
@@ -74,13 +79,15 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     Geocoder geocoder;
 
+    private static final int REQUEST_CHECK_SETTING = 1001;
     private static final String TAG = "UtamaFragment";
+
     private GoogleMap mMap;
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
     private Location lastLocation;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private static final int REQUEST_CHECK_SETTING = 1001;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -103,6 +110,9 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         refresh_utama = view.findViewById(R.id.layout_refresh_utama);
         refresh_utama.setOnRefreshListener(this);
+
+        //Inisialisasi Firebase
+        firebaseAuth = FirebaseAuth.getInstance();
 
         lrLokasi.setOnClickListener(view1 -> startActivity(new Intent(getActivity(), MapsActivity.class)));
         lrLogout.setOnClickListener(view2 -> showDialog());
@@ -131,6 +141,28 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 startActivityForResult(pictureAbsenMasuk, ConstantKey.CAMERA_REQUEST_CODE);
             });
         });
+
+        refreshLocationSchedule();
+    }
+
+    private void refreshLocationSchedule() {
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask doTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(() -> {
+                    try {
+                        getCurrentLocation();
+                    }
+                    catch (Exception e) {
+                        Log.d(TAG, "Lokasi refresh: " + e.getMessage());
+                    }
+                });
+            }
+        };
+
+        timer.schedule(doTask, 0, 60 * 1000);
     }
 
     private boolean isGPSEnabled() {
@@ -156,11 +188,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
                     Log.d(TAG, "Lokasi: GPS " + isGPSEnabled());
 
-                    locationRequest = LocationRequest.create();
-                    locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                    locationRequest.setInterval(5000);
-                    locationRequest.setFastestInterval(2000);
-
+                    buildLocationManager();
                     LocationServices.getFusedLocationProviderClient(requireContext())
                             .requestLocationUpdates(locationRequest, new LocationCallback() {
                                 @Override
@@ -174,7 +202,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                         double latitude = locationResult.getLocations().get(index).getLatitude();
                                         double longitude = locationResult.getLocations().get(index).getLongitude();
 
-                                        geocoder = new Geocoder(getContext(), Locale.getDefault());
+                                        geocoder = new Geocoder(requireContext(), Locale.getDefault());
 
                                         try {
                                             List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
@@ -284,7 +312,15 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         alertDialogBuilder
                 .setIcon(R.drawable.error)
                 .setCancelable(false)
-                .setPositiveButton("Ya", (dialog, which) -> getActivity().finish())
+                .setPositiveButton("Yes", (dialogInterface, i) -> {
+                    firebaseAuth.signOut();
+                    Preferences.setStaf(requireContext(), null);
+
+                    Intent keluar = new Intent(requireContext(), LoginActivity.class);
+                    startActivity(keluar);
+
+                    getActivity().finish();
+                })
                 .setNegativeButton("Tidak", (dialog, which) -> dialog.cancel());
 
         AlertDialog alertDialog = alertDialogBuilder.create();

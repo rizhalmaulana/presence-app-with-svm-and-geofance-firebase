@@ -18,7 +18,7 @@ public class Staf {
     private String username;
 
     @SerializedName("uriPhoto")
-    private Uri uriPhoto;
+    private String uriPhoto;
 
     public String getUid() {
         return uid;
@@ -52,11 +52,11 @@ public class Staf {
         this.username = username;
     }
 
-    public Uri getUriPhoto() {
+    public String getUriPhoto() {
         return uriPhoto;
     }
 
-    public void setUriPhoto(Uri uriPhoto) {
+    public void setUriPhoto(String uriPhoto) {
         this.uriPhoto = uriPhoto;
     }
 }

@@ -1,7 +1,6 @@
 package ac.id.ubpkarawang.sigeoo.Screens;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -19,6 +18,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.gson.Gson;
 
 import ac.id.ubpkarawang.sigeoo.Model.Akun.Staf;
 import ac.id.ubpkarawang.sigeoo.R;
@@ -67,10 +67,7 @@ public class LoginActivity extends AppCompatActivity {
                     String email = firebaseUser.getEmail();
                     String username = firebaseUser.getDisplayName();
                     String phone = firebaseUser.getPhoneNumber();
-                    Uri uriPhoto = firebaseUser.getPhotoUrl();
-
-                    Log.d(TAG, "Uid: " + uid);
-                    Log.d(TAG, "Staf: " + email);
+                    String uriPhoto = String.valueOf(firebaseUser.getPhotoUrl());
 
                     Staf stafUser = new Staf();
                     stafUser.setUid(uid);
@@ -82,11 +79,14 @@ public class LoginActivity extends AppCompatActivity {
                     if (authResult.getAdditionalUserInfo().isNewUser()) {
                         Log.d(TAG, "onSuccess: Akun dibuat");
                         Toast.makeText(this, "Akun berhasil dibuat..", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(this, "Selamat Datang " + username + ". Have a nice day!", Toast.LENGTH_SHORT).show();
                     }
 
-                    Preferences.setStaf(getApplicationContext(), stafUser);
+                    Staf user = new Gson().fromJson(new Gson().toJson(stafUser), Staf.class);
+                    Preferences.setStaf(getApplicationContext(), user);
+
+                    Log.d(TAG, "Login: " + user.getUsername());
+
+                    Toast.makeText(this, "Welcome " + username + ". Have a nice day!", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(this, MainActivity.class));
                     finish();
 
