@@ -1,6 +1,7 @@
 package ac.id.ubpkarawang.sigeoo.Screens.profil;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import ac.id.ubpkarawang.sigeoo.R;
+import ac.id.ubpkarawang.sigeoo.Utils.Preferences;
 
 public class ProfilFragment extends Fragment {
 
@@ -23,6 +25,8 @@ public class ProfilFragment extends Fragment {
 
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
+
+    private static final String TAG = "ProfileFragment";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,17 +42,24 @@ public class ProfilFragment extends Fragment {
         txtNama = view.findViewById(R.id.text_nama_profil);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
 
-        if (firebaseAuth == null) {
-            txtNama.setText("Nama Kosong");
-            txtEmail.setText("Email Kosong");
+        checkUser();
+    }
+
+    private void checkUser() {
+        if (firebaseAuth != null) {
+            if (Preferences.getStaf(requireContext()) != null) {
+                String username = firebaseUser.getDisplayName();
+                String email = firebaseUser.getEmail();
+
+                txtNama.setText(username);
+                txtEmail.setText(email);
+            } else {
+                Log.d(TAG, "Profile: Preferences Staf Null");
+            }
         } else {
-            firebaseUser = firebaseAuth.getCurrentUser();
-            String username = firebaseUser.getDisplayName();
-            String email = firebaseUser.getEmail();
-
-            txtNama.setText(username);
-            txtEmail.setText(email);
+            Log.d(TAG, "Profile: FirebaseAuth Null");
         }
     }
 }

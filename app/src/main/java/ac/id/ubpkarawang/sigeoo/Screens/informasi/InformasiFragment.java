@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,6 +60,7 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
     TextView sembuh, meninggal, positif, konfirmasi;
     SwipeRefreshLayout refresh_informasi;
     RelativeLayout view_load;
+    LinearLayout lrInfoCovid;
     CardView card_banner;
     MobileService mobileService;
     ScrollingPagerIndicator recycle_indicator;
@@ -91,6 +93,7 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
         positif = view.findViewById(R.id.text_positif_informasi);
         konfirmasi = view.findViewById(R.id.text_konfirmasi_informasi);
 
+        lrInfoCovid = view.findViewById(R.id.lr_info_covid);
         card_banner = view.findViewById(R.id.card_fill_banenr);
         recycle_indicator = view.findViewById(R.id.indicator_banner);
 
@@ -111,6 +114,7 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
         recycle_banner.setLayoutManager(layoutBanner);
 
         loadInformasi();
+        loadBanner();
     }
 
     private void loadInformasi() {
@@ -123,39 +127,42 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
             @Override
             public void onResponse(@NonNull Call<DataIndonesia> call, @NonNull Response<DataIndonesia> response) {
                 Log.d(TAG, "Status Covid: Berhasil diload");
+                Log.d(TAG, "Response Covid: " + response.body());
 
-                konfirmasi.setText(Objects.requireNonNull(response.body()).getCases());
-                sembuh.setText(response.body().getRecovered());
-                meninggal.setText(response.body().getDeaths());
-                positif.setText(response.body().getActive());
+                if (response.body() == null) {
+                    konfirmasi.setText("-");
+                    sembuh.setText("-");
+                    meninggal.setText("-");
+                    positif.setText("-");
 
-                ApiBeritaService apiBeritaService = ApiBeritaClient.getBerita().create(ApiBeritaService.class);
-                Call<BeritaResponse> callBerita = apiBeritaService.getBeritaTerkini(API_KEY);
-                callBerita.enqueue(new Callback<BeritaResponse>() {
-                    @Override
-                    public void onResponse(@NonNull Call<BeritaResponse> callBeritaResponse, @NonNull Response<BeritaResponse> beritaResponse) {
-                        assert beritaResponse.body() != null;
+                    lrInfoCovid.setVisibility(View.GONE);
+                } else {
+                    konfirmasi.setText(response.body().getCases());
+                    sembuh.setText(response.body().getRecovered());
+                    meninggal.setText(response.body().getDeaths());
+                    positif.setText(response.body().getActive());
 
-                        listBerita = beritaResponse.body().getResults();
-                        recycle_informasi.setAdapter(new BeritaAdapter(getContext(), listBerita));
+                    ApiBeritaService apiBeritaService = ApiBeritaClient.getBerita().create(ApiBeritaService.class);
+                    Call<BeritaResponse> callBerita = apiBeritaService.getBeritaTerkini(API_KEY);
+                    callBerita.enqueue(new Callback<BeritaResponse>() {
+                        @Override
+                        public void onResponse(@NonNull Call<BeritaResponse> callBeritaResponse, @NonNull Response<BeritaResponse> beritaResponse) {
+                            assert beritaResponse.body() != null;
 
-                        refresh_informasi.setVisibility(View.VISIBLE);
-                        view_load.setVisibility(View.GONE);
+                            listBerita = beritaResponse.body().getResults();
+                            recycle_informasi.setAdapter(new BeritaAdapter(getContext(), listBerita));
 
-                        //Load Banner API
-                        loadBanner();
-                    }
+                            //Load Banner API
+                            loadBanner();
+                        }
 
-                    @Override
-                    public void onFailure(@NonNull Call<BeritaResponse> callBeritaResponse, @NonNull Throwable throwableBerita) {
-                        Log.d(TAG, "Status Berita: " + throwableBerita);
-                        Toast.makeText(getContext(), "Koneksi kamu bermasalah, coba lagi.", Toast.LENGTH_SHORT).show();
-
-                        view_load.setVisibility(View.GONE);
-                        refresh_informasi.setVisibility(View.VISIBLE);
-
-                    }
-                });
+                        @Override
+                        public void onFailure(@NonNull Call<BeritaResponse> callBeritaResponse, @NonNull Throwable throwableBerita) {
+                            Log.d(TAG, "Status Berita: " + throwableBerita);
+                            Toast.makeText(getContext(), "Koneksi kamu bermasalah, coba lagi.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
 
             }
 
@@ -192,9 +199,21 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
                         recycle_banner.setVisibility(View.GONE);
                         card_banner.setVisibility(View.VISIBLE);
 
+                        refresh_informasi.setVisibility(View.VISIBLE);
+                        view_load.setVisibility(View.GONE);
                     } else {
                         Log.d(TAG, "Status data banner: " + body.getData());
+
+                        if (body.getData() == null) {
+                            recycle_banner.setVisibility(View.GONE);
+                            card_banner.setVisibility(View.VISIBLE);
+
+                            refresh_informasi.setVisibility(View.VISIBLE);
+                            view_load.setVisibility(View.GONE);
+                        }
+
                         initialize();
+
                         for (int i = 0; i < body.getData().size(); i++){
                             final Banner itemBanner = new Banner();
                             itemBanner.setFoto_banner(body.getData().get(i).getFoto_banner());
@@ -204,8 +223,12 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
                         BannerAdapter bannerAdapter = new BannerAdapter(getContext(), listBanner);
                         recycle_banner.setAdapter(bannerAdapter);
                         recycle_indicator.attachToRecyclerView(recycle_banner);
+
                         recycle_banner.setVisibility(View.VISIBLE);
                         card_banner.setVisibility(View.GONE);
+
+                        refresh_informasi.setVisibility(View.VISIBLE);
+                        view_load.setVisibility(View.GONE);
                     }
                 }
             }
@@ -217,7 +240,8 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
                 recycle_banner.setVisibility(View.GONE);
                 card_banner.setVisibility(View.VISIBLE);
 
-                Toast.makeText(getContext(), "Gagal load banner! Coba lagi", Toast.LENGTH_SHORT).show();
+                refresh_informasi.setVisibility(View.VISIBLE);
+                view_load.setVisibility(View.GONE);
             }
         });
 

@@ -1,13 +1,13 @@
 package ac.id.ubpkarawang.sigeoo.Screens.utama;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -17,7 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +29,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -51,42 +51,49 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ac.id.ubpkarawang.sigeoo.Model.Informasi.JamKerjaItem;
 import ac.id.ubpkarawang.sigeoo.R;
 import ac.id.ubpkarawang.sigeoo.Screens.LoginActivity;
 import ac.id.ubpkarawang.sigeoo.Screens.MapsActivity;
 import ac.id.ubpkarawang.sigeoo.Screens.PeriksaActivity;
-import ac.id.ubpkarawang.sigeoo.Utils.ConstantKey;
+import ac.id.ubpkarawang.sigeoo.Utils.ApiUtils;
+import ac.id.ubpkarawang.sigeoo.Utils.MobileService;
 import ac.id.ubpkarawang.sigeoo.Utils.Preferences;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, LocationListener {
 
     BottomSheetDialog bottomSheetDialog;
     ImageView img_masuk;
     MaterialButton bs_absen_masuk;
-    LinearLayout lrAbsenMasuk, lrLokasi, lrLogout, lrMasuk, lrViewMenuUtama;
+    LinearLayout lrAbsenMasuk, lrLokasi, lrLogout, lrViewMenuUtama;
     RelativeLayout rlViewLoadUtama, rlViewTopbar;
     SwipeRefreshLayout refresh_utama;
     CardView cvPeriksa;
-    TextView txtLokasi;
-
-    Geocoder geocoder;
+    TextView txtLokasi, txtJamMasuk, txtJamPulang;
+    View sheetMasuk;
+    MobileService mobileService;
+    FusedLocationProviderClient fusedLocationClient;
 
     private static final int REQUEST_CHECK_SETTING = 1001;
     private static final String TAG = "UtamaFragment";
 
+    private Geocoder geocoder;
     private GoogleMap mMap;
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
     private Location lastLocation;
-    private FusedLocationProviderClient fusedLocationProviderClient;
     private FirebaseAuth firebaseAuth;
 
     @Override
@@ -100,9 +107,10 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         lrLokasi = view.findViewById(R.id.lr_lokasi);
         lrLogout = view.findViewById(R.id.lr_logout);
-        lrMasuk = view.findViewById(R.id.lr_masuk);
         cvPeriksa = view.findViewById(R.id.cv_periksa);
         txtLokasi = view.findViewById(R.id.txt_lokasi_sekarang);
+        txtJamMasuk = view.findViewById(R.id.text_jam_masuk);
+        txtJamPulang = view.findViewById(R.id.text_jam_pulang);
 
         rlViewLoadUtama = view.findViewById(R.id.view_load_utama);
         rlViewTopbar = view.findViewById(R.id.rl_view_topbar);
@@ -114,35 +122,71 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         //Inisialisasi Firebase
         firebaseAuth = FirebaseAuth.getInstance();
 
+        // Inisialisasi Mobile Service
+        mobileService = ApiUtils.MobileService(getContext());
+
+
         lrLokasi.setOnClickListener(view1 -> startActivity(new Intent(getActivity(), MapsActivity.class)));
         lrLogout.setOnClickListener(view2 -> showDialog());
         cvPeriksa.setOnClickListener(view3 -> startActivity(new Intent(getActivity(), PeriksaActivity.class)));
 
-        bottomSheetDialog = new BottomSheetDialog(requireContext(), R.style.ThemeOverlay_MaterialComponents_BottomSheetDialog);
-        View sheetMasuk = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_absen, view.findViewById(R.id.bottom_sheet_masuk));
+        bottomSheetDialog = new BottomSheetDialog(requireContext(), R.style.BottomSheetDialogTheme);
+        sheetMasuk = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_absen, view.findViewById(R.id.bottom_sheet_masuk));
 
-        img_masuk = sheetMasuk.findViewById(R.id.img_absen_masuk);
-        bs_absen_masuk = sheetMasuk.findViewById(R.id.btn_bs_absen_masuk);
-        lrAbsenMasuk = sheetMasuk.findViewById(R.id.lr_bs_absen_masuk);
+        img_masuk = sheetMasuk.findViewById(R.id.img_sheet_absen_masuk);
+        bs_absen_masuk = sheetMasuk.findViewById(R.id.btn_sheet_absen);
+        lrAbsenMasuk = sheetMasuk.findViewById(R.id.lr_sheet_absen_masuk);
 
-        lrMasuk.setOnClickListener(view4 -> {
-            bottomSheetDialog.setContentView(sheetMasuk);
-            bottomSheetDialog.setCanceledOnTouchOutside(false);
-            bottomSheetDialog.show();
+        getOfficeHours();
+        refreshLocationSchedule();
+    }
 
-            img_masuk.setImageDrawable(getResources().getDrawable(R.drawable.gallery));
+    private void getOfficeHours() {
+        Calendar c = Calendar.getInstance();
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat parsingDate = new SimpleDateFormat("EEEE");
+        String strDate = parsingDate.format(c.getTime());
 
-            bs_absen_masuk.setEnabled(false);
-            bs_absen_masuk.setBackgroundColor(getResources().getColor(R.color.white));
-            bs_absen_masuk.setTextColor(getResources().getColor(R.color.colorPrimary));
+        Log.d(TAG,"Date Indonesia : " + strDate);
 
-            lrAbsenMasuk.setOnClickListener(view5 -> {
-                Intent pictureAbsenMasuk = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(pictureAbsenMasuk, ConstantKey.CAMERA_REQUEST_CODE);
-            });
+        Map<String, String> map = new HashMap<>();
+        map.put("hari_ini", strDate);
+
+        mobileService.postJam(map).enqueue(new Callback<JamKerjaItem>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onResponse(@NonNull Call<JamKerjaItem> call, @NonNull retrofit2.Response<JamKerjaItem> response) {
+                JamKerjaItem body = response.body();
+                if (response.isSuccessful()) {
+                    if (body.isState()) {
+                        Log.d(TAG, "Result jam kerja: " + body.getData().get(0).getStart_time());
+
+                        txtJamMasuk.setText(body.getData().get(0).getStart_time());
+                        txtJamPulang.setText(body.getData().get(0).getEnd_time());
+                    } else {
+                        Log.d(TAG, "State jam kerja: null");
+
+                        txtJamMasuk.setText("08:00");
+                        txtJamPulang.setText("16:00");
+                    }
+                } else {
+                    Log.d(TAG, "Jam Kerja status: not success");
+
+                    txtJamMasuk.setText("08:00");
+                    txtJamPulang.setText("16:00");
+                }
+            }
+
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onFailure(@NonNull Call<JamKerjaItem> call, @NonNull Throwable t) {
+                Log.d(TAG, "Failure result: " + t.getMessage());
+
+                txtJamMasuk.setText("08:00");
+                txtJamPulang.setText("16:00");
+            }
         });
 
-        refreshLocationSchedule();
     }
 
     private void refreshLocationSchedule() {
@@ -189,6 +233,8 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                     Log.d(TAG, "Lokasi: GPS " + isGPSEnabled());
 
                     buildLocationManager();
+                    buildLocationCallback();
+
                     LocationServices.getFusedLocationProviderClient(requireContext())
                             .requestLocationUpdates(locationRequest, new LocationCallback() {
                                 @Override
@@ -197,6 +243,8 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
                                     if (locationResult.getLocations().size() > 0) {
                                         Log.d(TAG, "Lokasi: Size " + locationResult.getLocations().size());
+                                        Log.d(TAG, "Akurasi Tersedia: " + locationResult.getLastLocation().hasAccuracy());
+                                        Log.d(TAG, "Lokasi: Akurasi " + locationResult.getLastLocation().getAccuracy());
 
                                         int index = locationResult.getLocations().size() - 1;
                                         double latitude = locationResult.getLocations().get(index).getLatitude();
@@ -291,28 +339,27 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     private void buildLocationCallback() {
         locationCallback = new LocationCallback() {
             @Override
-            public void onLocationResult(@NonNull @NotNull LocationResult locationResult) {
-                if (mMap != null) {
-                    lastLocation = locationResult.getLastLocation();
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+
+                lastLocation = locationResult.getLastLocation();
+
+                for (Location location : locationResult.getLocations()) {
+                    Log.d(TAG, "Akurasi Lokasi: " + location.getAccuracy());
                 }
             }
         };
-    }
-
-    private void absenMasuk() {
-        Toast.makeText(requireActivity(), "Gambar Terkirim..", Toast.LENGTH_SHORT).show();
     }
 
     private void showDialog() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
 
         alertDialogBuilder
-                .setTitle("Informasi")
+                .setTitle("Konfirmasi")
                 .setMessage("Apa anda yakin ingin keluar?");
         alertDialogBuilder
-                .setIcon(R.drawable.error)
+                .setIcon(R.drawable.warning)
                 .setCancelable(false)
-                .setPositiveButton("Yes", (dialogInterface, i) -> {
+                .setPositiveButton("Keluar", (dialogInterface, i) -> {
                     firebaseAuth.signOut();
                     Preferences.setStaf(requireContext(), null);
 
@@ -321,7 +368,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
                     getActivity().finish();
                 })
-                .setNegativeButton("Tidak", (dialog, which) -> dialog.cancel());
+                .setNegativeButton("Batal", (dialog, which) -> dialog.cancel());
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
@@ -340,25 +387,6 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                     Toast.makeText(requireContext(), "Lokasi diperlukan, silahkan aktifkan!", Toast.LENGTH_SHORT).show();
             }
         }
-
-        if (requestCode == ConstantKey.CAMERA_REQUEST_CODE) {
-            switch (resultCode) {
-                case Activity.RESULT_OK:
-                    Bitmap photoAbsen = (Bitmap) data.getExtras().get("data");
-                    img_masuk.setImageBitmap(photoAbsen);
-
-                    bs_absen_masuk.setEnabled(true);
-                    bs_absen_masuk.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                    bs_absen_masuk.setTextColor(getResources().getColor(R.color.white));
-
-                    bs_absen_masuk.setOnClickListener(view -> absenMasuk());
-
-                    break;
-                case Activity.RESULT_CANCELED:
-                    Toast.makeText(requireActivity(), "Izin Kamera diperlukan, silahkan izinkan!", Toast.LENGTH_SHORT).show();
-            }
-
-        }
     }
 
     @Override
@@ -368,6 +396,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         new Handler().postDelayed(() -> {
             if (isGPSEnabled()) {
                 getCurrentLocation();
+                getOfficeHours();
             } else {
                 turnOnGPS();
             }
@@ -379,9 +408,9 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     public void onStop() {
         buildLocationManager();
         buildLocationCallback();
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
-        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        fusedLocationClient.removeLocationUpdates(locationCallback);
         super.onStop();
     }
 
@@ -390,6 +419,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         new Handler().postDelayed(() -> {
             if (isGPSEnabled()) {
                 getCurrentLocation();
+                getOfficeHours();
             } else {
                 turnOnGPS();
             }

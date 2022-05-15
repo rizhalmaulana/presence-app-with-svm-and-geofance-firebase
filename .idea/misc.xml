@@ -37,19 +37,22 @@
         <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/fragment_utama.xml" value="0.13958333333333334" />
         <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/layout/view_item_informasi.xml" value="0.13814432989690723" />
         <entry key="..\:/Users/Rizal/AndroidStudioProjects/Sigeoo/app/src/main/res/menu/bottom_nav_menu.xml" value="0.13958333333333334" />
+        <entry key="app/src/main/res/drawable/board_white.xml" value="0.3145" />
+        <entry key="app/src/main/res/drawable/bottom_sheet_background.xml" value="0.3145" />
+        <entry key="app/src/main/res/drawable/button_white.xml" value="0.3145" />
         <entry key="app/src/main/res/layout/activity_geofence.xml" value="0.20416666666666666" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.21" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.17118055555555556" />
-        <entry key="app/src/main/res/layout/activity_maps.xml" value="0.16597938144329896" />
+        <entry key="app/src/main/res/layout/activity_maps.xml" value="0.165" />
         <entry key="app/src/main/res/layout/activity_onboarding.xml" value="0.16597938144329896" />
         <entry key="app/src/main/res/layout/activity_periksa.xml" value="0.17222222222222222" />
-        <entry key="app/src/main/res/layout/bottom_sheet_absen.xml" value="0.21" />
+        <entry key="app/src/main/res/layout/bottom_sheet_absen.xml" value="0.25" />
         <entry key="app/src/main/res/layout/bottom_sheet_keloladata.xml" value="0.32881944444444444" />
         <entry key="app/src/main/res/layout/fragment_informasi.xml" value="0.19027777777777777" />
         <entry key="app/src/main/res/layout/fragment_profil.xml" value="0.2076388888888889" />
         <entry key="app/src/main/res/layout/fragment_utama.xml" value="0.18" />
         <entry key="app/src/main/res/layout/menu_layout.xml" value="0.26666666666666666" />
-        <entry key="app/src/main/res/layout/menu_utama_layout.xml" value="0.17118055555555556" />
+        <entry key="app/src/main/res/layout/menu_utama_layout.xml" value="0.22" />
         <entry key="app/src/main/res/layout/view_item_banner.xml" value="0.32881944444444444" />
         <entry key="app/src/main/res/layout/view_item_informasi.xml" value="0.25" />
         <entry key="app/src/main/res/layout/view_loading.xml" value="0.25" />

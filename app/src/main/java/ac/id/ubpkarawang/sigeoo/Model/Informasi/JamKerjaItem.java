@@ -2,18 +2,18 @@ package ac.id.ubpkarawang.sigeoo.Model.Informasi;
 
 import java.util.List;
 
-public class BannerItem {
-    List<Banner> data;
+public class JamKerjaItem {
+    List<JamKerja> data;
     boolean state;
 
-    public BannerItem(){
+    public JamKerjaItem() {
     }
 
-    public List<Banner> getData() {
+    public List<JamKerja> getData() {
         return data;
     }
 
-    public void setData(List<Banner> data) {
+    public void setData(List<JamKerja> data) {
         this.data = data;
     }
 
@@ -24,5 +24,4 @@ public class BannerItem {
     public void setState(boolean state) {
         this.state = state;
     }
-
 }
