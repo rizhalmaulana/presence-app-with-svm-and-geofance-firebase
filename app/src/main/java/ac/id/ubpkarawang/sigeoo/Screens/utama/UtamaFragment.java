@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -58,10 +59,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ac.id.ubpkarawang.sigeoo.Model.Informasi.JamKerjaItem;
+import ac.id.ubpkarawang.sigeoo.BuildConfig;
+import ac.id.ubpkarawang.sigeoo.Model.Utama.JamKerjaItem;
 import ac.id.ubpkarawang.sigeoo.R;
 import ac.id.ubpkarawang.sigeoo.Screens.LoginActivity;
 import ac.id.ubpkarawang.sigeoo.Screens.MapsActivity;
@@ -125,7 +128,6 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         // Inisialisasi Mobile Service
         mobileService = ApiUtils.MobileService(getContext());
 
-
         lrLokasi.setOnClickListener(view1 -> startActivity(new Intent(getActivity(), MapsActivity.class)));
         lrLogout.setOnClickListener(view2 -> showDialog());
         cvPeriksa.setOnClickListener(view3 -> startActivity(new Intent(getActivity(), PeriksaActivity.class)));
@@ -139,6 +141,31 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
         getOfficeHours();
         refreshLocationSchedule();
+
+        Log.d(TAG, "Fake GPS: " + isMockLocationEnabled());
+
+    }
+
+    private boolean isMockLocationEnabled()
+    {
+        boolean isMockLocation;
+
+        try {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                AppOpsManager opsManager = (AppOpsManager) requireActivity().getSystemService(Context.APP_OPS_SERVICE);
+                isMockLocation = (Objects.requireNonNull(opsManager).checkOp(AppOpsManager.OPSTR_MOCK_LOCATION, android.os.Process.myUid(), BuildConfig.APPLICATION_ID)== AppOpsManager.MODE_ALLOWED);
+
+                Log.d(TAG, "mocklocation: " + isMockLocation);
+            } else {
+                isMockLocation = !android.provider.Settings.Secure.getString(requireActivity().getContentResolver(), "mock_location").equals("0");
+
+                Log.d(TAG, "mocklocation: " + isMockLocation);
+            }
+
+        } catch (Exception e) {
+            return false;
+        }
+        return isMockLocation;
     }
 
     private void getOfficeHours() {
@@ -198,6 +225,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 handler.post(() -> {
                     try {
                         getCurrentLocation();
+                        Log.d(TAG, "Lokasi refresh: running");
                     }
                     catch (Exception e) {
                         Log.d(TAG, "Lokasi refresh: " + e.getMessage());
@@ -229,6 +257,22 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 if (isGPSEnabled()) {
+//                    if (!isMockLocationEnabled()) {
+//                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+//
+//                        alertDialogBuilder
+//                                .setTitle("Peringatan")
+//                                .setMessage("Kamu menggunakan lokasi palsu! Silahkan matikan di pengaturan.");
+//                        alertDialogBuilder
+//                                .setIcon(R.drawable.warning)
+//                                .setCancelable(false)
+//                                .setPositiveButton("Oke", (dialogInterface, i) -> {
+//                                    startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
+//                                });
+//
+//                        AlertDialog alertDialog = alertDialogBuilder.create();
+//                        alertDialog.show();
+//                    }
 
                     Log.d(TAG, "Lokasi: GPS " + isGPSEnabled());
 
@@ -242,9 +286,8 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                     super.onLocationResult(locationResult);
 
                                     if (locationResult.getLocations().size() > 0) {
-                                        Log.d(TAG, "Lokasi: Size " + locationResult.getLocations().size());
-                                        Log.d(TAG, "Akurasi Tersedia: " + locationResult.getLastLocation().hasAccuracy());
-                                        Log.d(TAG, "Lokasi: Akurasi " + locationResult.getLastLocation().getAccuracy());
+                                        Log.d(TAG, "Akurasi tersedia: " + locationResult.getLastLocation().hasAccuracy());
+                                        Log.d(TAG, "Akurasi lokasi: " + locationResult.getLastLocation().getAccuracy());
 
                                         int index = locationResult.getLocations().size() - 1;
                                         double latitude = locationResult.getLocations().get(index).getLatitude();
@@ -261,7 +304,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                             rlViewTopbar.setVisibility(View.VISIBLE);
 
                                         } catch (IOException exception) {
-                                            Log.d(TAG, "Lokasi: Exception " + exception.getLocalizedMessage());
+                                            Log.d(TAG, "Lokasi: exception " + exception.getLocalizedMessage());
 
                                             rlViewLoadUtama.setVisibility(View.GONE);
                                             lrViewMenuUtama.setVisibility(View.VISIBLE);
@@ -273,7 +316,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                 }
                             }, Looper.getMainLooper());
                 } else {
-                    Log.d(TAG, "Lokasi: GPS Not Active");
+                    Log.d(TAG, "Lokasi: GPS not active");
                     turnOnGPS();
                 }
 
@@ -290,7 +333,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         locationRequest.setInterval(5000);
         locationRequest.setFastestInterval(2000);
 
-        Log.d(TAG, "Lokasi: GPS Turn On");
+        Log.d(TAG, "Lokasi: GPS turn on");
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
@@ -305,7 +348,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 Toast.makeText(getContext(), "GPS berhasil diaktifkan.", Toast.LENGTH_SHORT).show();
 
             } catch (ApiException e) {
-                Log.d(TAG, "Lokasi: Exception " + e.getStatusCode());
+                Log.d(TAG, "Lokasi: exception " + e.getStatusCode());
 
                 switch (e.getStatusCode()) {
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
@@ -315,13 +358,13 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                             resolvableApiException.startResolutionForResult(requireActivity(), REQUEST_CHECK_SETTING);
 
                         } catch (IntentSender.SendIntentException sendIntentException) {
-                            Log.d(TAG, "Lokasi: Exception " + sendIntentException.getMessage());
+                            Log.d(TAG, "Lokasi: exception " + sendIntentException.getMessage());
                         }
 
                         break;
 
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        Log.d(TAG, "Lokasi: Device Not Have Location");
+                        Log.d(TAG, "Lokasi: Perangkat tidak dapat menemukan lokasi");
                         break;
                 }
             }
@@ -397,8 +440,6 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             if (isGPSEnabled()) {
                 getCurrentLocation();
                 getOfficeHours();
-            } else {
-                turnOnGPS();
             }
             refresh_utama.setRefreshing(false);
         }, 3000);

@@ -16,43 +16,40 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.Locale;
 
 import ac.id.ubpkarawang.sigeoo.Adapters.BannerAdapter;
 import ac.id.ubpkarawang.sigeoo.Adapters.BeritaAdapter;
-import ac.id.ubpkarawang.sigeoo.Base.BaseFragment;
 import ac.id.ubpkarawang.sigeoo.Model.Covid.DataIndonesia;
 import ac.id.ubpkarawang.sigeoo.Model.Informasi.Banner;
 import ac.id.ubpkarawang.sigeoo.Model.Informasi.BannerItem;
 import ac.id.ubpkarawang.sigeoo.Model.Informasi.Berita;
 import ac.id.ubpkarawang.sigeoo.Model.Informasi.BeritaResponse;
 import ac.id.ubpkarawang.sigeoo.R;
-import ac.id.ubpkarawang.sigeoo.Utils.ApiBeritaClient;
-import ac.id.ubpkarawang.sigeoo.Utils.ApiBeritaService;
-import ac.id.ubpkarawang.sigeoo.Utils.ApiCovidClient;
-import ac.id.ubpkarawang.sigeoo.Utils.ApiRetrofitClient;
+import ac.id.ubpkarawang.sigeoo.Utils.ApiInformasiService;
 import ac.id.ubpkarawang.sigeoo.Utils.ApiUtils;
 import ac.id.ubpkarawang.sigeoo.Utils.MobileService;
+import ac.id.ubpkarawang.sigeoo.Utils.RetrofitClient;
+import ac.id.ubpkarawang.sigeoo.Utils.Static;
 import ac.id.ubpkarawang.sigeoo.Utils.UtlisCallback;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.tinkoff.scrollingpagerindicator.ScrollingPagerIndicator;
 
-public class InformasiFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener, UtlisCallback {
+public class InformasiFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, UtlisCallback {
 
     private BeritaAdapter beritaAdapter;
     private BannerAdapter bannerAdapter;
 
     private Context context;
     private RecyclerView recycle_informasi, recycle_banner;
-
-    private final static String API_KEY = "da1131b188264bd6b8842ffa7db53761";
 
     private ArrayList<Berita> listBerita = new ArrayList<>();
     private ArrayList<Banner> listBanner = new ArrayList<>();
@@ -122,7 +119,7 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
         view_load.setVisibility(View.VISIBLE);
         refresh_informasi.setVisibility(View.GONE);
 
-        Call<DataIndonesia> dataCovidIndonesia = ApiCovidClient.service().getKasus();
+        Call<DataIndonesia> dataCovidIndonesia = RetrofitClient.serviceCovid().getKasus();
         dataCovidIndonesia.enqueue(new Callback<DataIndonesia>() {
             @Override
             public void onResponse(@NonNull Call<DataIndonesia> call, @NonNull Response<DataIndonesia> response) {
@@ -137,13 +134,23 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
 
                     lrInfoCovid.setVisibility(View.GONE);
                 } else {
-                    konfirmasi.setText(response.body().getCases());
-                    sembuh.setText(response.body().getRecovered());
-                    meninggal.setText(response.body().getDeaths());
-                    positif.setText(response.body().getActive());
+                    int responseKonfirmasi = Integer.parseInt(response.body().getCases());
+                    int responseSembuh = Integer.parseInt(response.body().getRecovered());
+                    int responseMeninggal = Integer.parseInt(response.body().getDeaths());
+                    int responsePositif = Integer.parseInt(response.body().getActive());
 
-                    ApiBeritaService apiBeritaService = ApiBeritaClient.getBerita().create(ApiBeritaService.class);
-                    Call<BeritaResponse> callBerita = apiBeritaService.getBeritaTerkini(API_KEY);
+                    String formatKonfirmasi = String.format(Locale.US, "%,d", responseKonfirmasi).replace(',', '.');
+                    String formatSembuh = String.format(Locale.US, "%,d", responseSembuh).replace(',', '.');
+                    String formatMeninggal = String.format(Locale.US, "%,d", responseMeninggal).replace(',', '.');
+                    String formatPositif = String.format(Locale.US, "%,d", responsePositif).replace(',', '.');
+
+                    konfirmasi.setText(formatKonfirmasi);
+                    sembuh.setText(formatSembuh);
+                    meninggal.setText(formatMeninggal);
+                    positif.setText(formatPositif);
+
+                    ApiInformasiService apiInformasiService = RetrofitClient.serviceBerita().create(ApiInformasiService.class);
+                    Call<BeritaResponse> callBerita = apiInformasiService.getBeritaTerkini(Static.API_KEY_BERITA_TERKINI);
                     callBerita.enqueue(new Callback<BeritaResponse>() {
                         @Override
                         public void onResponse(@NonNull Call<BeritaResponse> callBeritaResponse, @NonNull Response<BeritaResponse> beritaResponse) {
@@ -151,6 +158,8 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
 
                             listBerita = beritaResponse.body().getResults();
                             recycle_informasi.setAdapter(new BeritaAdapter(getContext(), listBerita));
+
+                            Log.d(TAG, "Status data berita: " + beritaResponse.body().getResults());
 
                             //Load Banner API
                             loadBanner();
@@ -181,9 +190,8 @@ public class InformasiFragment extends BaseFragment implements SwipeRefreshLayou
         });
     }
 
-
     private void loadBanner() {
-        Call<BannerItem> dataBanner = ApiRetrofitClient.service().getbanner();
+        Call<BannerItem> dataBanner = RetrofitClient.servicesBanner().getbanner();
         dataBanner.enqueue(new Callback<BannerItem>() {
             @Override
             public void onResponse(@NonNull Call<BannerItem> call, @NonNull Response<BannerItem> response) {

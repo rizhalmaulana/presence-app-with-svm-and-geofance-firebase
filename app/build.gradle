@@ -83,6 +83,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp-urlconnection:4.9.3'
 
     implementation 'com.github.dhaval2404:imagepicker:2.1'
+    implementation 'io.github.ParkSangGwon:tedpermission-normal:3.3.0'
 
     implementation 'com.amitshekhar.android:android-networking:1.0.2'
     implementation 'com.afollestad.material-dialogs:core:3.3.0'

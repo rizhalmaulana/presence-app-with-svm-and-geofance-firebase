@@ -2,7 +2,6 @@ package ac.id.ubpkarawang.sigeoo.Screens;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -17,6 +16,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -32,7 +32,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -74,23 +73,34 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.single.PermissionListener;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.normal.TedPermission;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
+import ac.id.ubpkarawang.sigeoo.Helpers.LoadingDialog;
 import ac.id.ubpkarawang.sigeoo.Model.Informasi.MyLatLng;
+import ac.id.ubpkarawang.sigeoo.Model.Utama.SvmItem;
 import ac.id.ubpkarawang.sigeoo.R;
-import ac.id.ubpkarawang.sigeoo.Utils.ConstantKey;
+import ac.id.ubpkarawang.sigeoo.Utils.ApiUtils;
+import ac.id.ubpkarawang.sigeoo.Utils.FileUtils;
 import ac.id.ubpkarawang.sigeoo.Utils.LoadLocationListener;
+import ac.id.ubpkarawang.sigeoo.Utils.MobileService;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GeoQueryEventListener, LoadLocationListener {
 
@@ -103,35 +113,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<LatLng> workArea;
     private GeoQuery geoQuery;
 
-    private DatabaseReference UBPKarawang, myLocationRef;
     private Location lastLocation;
     private LoadLocationListener listener;
 
-    private static final int REQUEST_CHECK_SETTING = 1001;
+    private static final int REQUEST_CAMERA = 123;
+    private static final int REQUEST_LOC = 1001;
     private static final String TAG = "MapsActivity";
 
-    private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
+    private Uri mediaPath;
 
     BottomSheetDialog bottomSheetDialog;
     ImageView img_masuk, img_pulang, img_sigeoo, img_close;
     MaterialButton bs_absen, btn_maps_proses;
     LinearLayout lrAbsenMasuk, lrAbsenPulang;
-    View sheetAbsen, viewSnackBar;
+    View sheetAbsen;
     TextView txtKetLokasi;
     Snackbar snackbar;
+    MobileService mobileService, mobileServiceSvm;
+    LoadingDialog loadingDialog;
+    File filesDir, imageFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
 
-        btn_maps_proses = findViewById(R.id.btn_maps_absen);
+        mobileService = ApiUtils.MobileService(getApplicationContext());
+        mobileServiceSvm = ApiUtils.servicePython(getApplicationContext());
 
+        btn_maps_proses = findViewById(R.id.btn_maps_absen);
         bottomSheetDialog = new BottomSheetDialog(MapsActivity.this, R.style.BottomSheetDialogTheme);
+        loadingDialog = new LoadingDialog(MapsActivity.this);
 
         sheetAbsen = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_absen, findViewById(R.id.bottom_sheet_masuk));
         img_masuk = sheetAbsen.findViewById(R.id.img_sheet_absen_masuk);
@@ -143,32 +159,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         lrAbsenPulang = sheetAbsen.findViewById(R.id.lr_sheet_absen_pulang);
         txtKetLokasi = sheetAbsen.findViewById(R.id.text_sheet_ket);
 
-        Dexter.withContext(this)
-                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                .withListener(new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted(PermissionGrantedResponse response) {
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                checkConnection();
+                turnOnGPS();
+                buildLocationManager();
+                buildLocationCallback();
+                fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MapsActivity.this);
 
-                        checkConnection();
-                        turnOnGPS();
-                        buildLocationManager();
-                        buildLocationCallback();
-                        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MapsActivity.this);
+                initArea();
+                settingGeofire();
+            }
 
-                        initArea();
-                        settingGeofire();
-                    }
+            @Override
+            public void onPermissionDenied(List<String> deniedPermissions) {
+                Toast.makeText(getApplicationContext(), "Izin akses lokasi ditolak!", Toast.LENGTH_SHORT).show();
+            }
+        };
 
-                    @Override
-                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-                        Toast.makeText(getApplicationContext(), "Izin akses lokasi ditolak!", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-
-                    }
-                }).check();
+        TedPermission.create()
+                .setPermissionListener(permissionlistener)
+                .setRationaleTitle("Aktifkan kamera")
+                .setRationaleMessage(R.string.izin_kamera)
+                .setGotoSettingButtonText("Bla Bla")
+                .setDeniedTitle("Izin Ditolak")
+                .setDeniedMessage(R.string.izin_kamera_ditolak)
+                .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA)
+                .check();
     }
 
     private void checkConnection() {
@@ -209,9 +227,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         try {
                             ResolvableApiException resolvableApiException = (ResolvableApiException) e;
-                            resolvableApiException.startResolutionForResult(MapsActivity.this, REQUEST_CHECK_SETTING);
+                            resolvableApiException.startResolutionForResult(MapsActivity.this, REQUEST_LOC);
                         } catch (IntentSender.SendIntentException sendIntentException) {
-
+                            Log.d(TAG, "Maps Activity: " + sendIntentException.getMessage());
                         }
                         break;
 
@@ -223,7 +241,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void initArea() {
-        UBPKarawang = FirebaseDatabase.getInstance()
+        DatabaseReference UBPKarawang = FirebaseDatabase.getInstance()
                 .getReference("AreaKerja")
                 .child("UBPKarawang");
 
@@ -271,7 +289,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void settingGeofire() {
-        myLocationRef = FirebaseDatabase.getInstance().getReference("LokasiStaf");
+        DatabaseReference myLocationRef = FirebaseDatabase.getInstance().getReference("LokasiStaf");
         geoFire = new GeoFire(myLocationRef);
     }
 
@@ -302,7 +320,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void absenMasuk() {
-        Toast.makeText(this, "Gambar Terkirim..", Toast.LENGTH_SHORT).show();
+        File file = FileUtils.getFile(this, mediaPath);
+
+        RequestBody requestBody = RequestBody.create(MediaType.parse(String.valueOf(mediaPath)), file);
+        MultipartBody.Part partImage = MultipartBody.Part.createFormData("data_gambar", file.getName(), requestBody);
+
+        Log.d(TAG, "Part Image: " + partImage);
+
+        loadingDialog.startLoading();
+        mobileServiceSvm.postImage(partImage).enqueue(new Callback<SvmItem>() {
+            @Override
+            public void onResponse(Call<SvmItem> call, Response<SvmItem> response) {
+                if (response.isSuccessful()) {
+                    SvmItem body = response.body();
+                    if (body.isState()) {
+                        Log.d(TAG, "Proses SVM: Gambar terkirim");
+                    } else {
+                        Log.d(TAG, "Proses SVM: null");
+                    }
+                } else {
+                    Log.d(TAG, "Response: " + response.message());
+                    Log.d(TAG, "Proses SVM: Tidak sukses");
+                }
+                loadingDialog.dismissLoading();
+            }
+
+            @Override
+            public void onFailure(Call<SvmItem> call, Throwable t) {
+                Log.d(TAG, "Proses SVM: Gagal response");
+                loadingDialog.dismissLoading();
+            }
+        });
     }
 
     private void sendNotification(String title, String content) {
@@ -339,8 +387,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void addCircleArea() {
-        checkConnection();
-
         if (geoQuery != null){
             geoQuery.removeGeoQueryEventListener(this);
             geoQuery.removeAllListeners();
@@ -389,13 +435,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         snackbar.show();
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        checkConnection();
+    private void bukaKamera() {
+        Intent pictureAbsenMasuk = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (pictureAbsenMasuk.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(pictureAbsenMasuk, REQUEST_CAMERA);
+        }
+    }
 
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
 
         if (fusedLocationProviderClient != null) {
@@ -446,10 +498,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             bs_absen.setBackgroundColor(getResources().getColor(R.color.white));
             bs_absen.setTextColor(getResources().getColor(R.color.colorPrimary));
 
-            lrAbsenMasuk.setOnClickListener(viewAbsen -> {
-                Intent pictureAbsenMasuk = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(pictureAbsenMasuk, ConstantKey.CAMERA_REQUEST_CODE);
-            });
+            lrAbsenMasuk.setOnClickListener(viewAbsen -> bukaKamera());
         });
 
         img_close.setOnClickListener(view -> showDialogClose());
@@ -493,7 +542,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onGeoQueryReady() {
-
     }
 
     @Override
@@ -502,36 +550,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_CHECK_SETTING) {
-            switch (resultCode) {
-                case Activity.RESULT_OK:
+        Log.d(TAG, "Request Code: " + requestCode);
+
+        switch (requestCode){
+            case REQUEST_LOC:
+                if (resultCode == RESULT_OK) {
                     Log.d(TAG, "Maps Activity: Lokasi diaktifkan");
-                    break;
-                case Activity.RESULT_CANCELED:
-                    Log.d(TAG, "Maps Activity: Izin Maps Diperlukan!");
-            }
-        }
+                }
 
-        if (requestCode == ConstantKey.CAMERA_REQUEST_CODE) {
-            switch (resultCode) {
-                case Activity.RESULT_OK:
-                    Bitmap photoAbsen = (Bitmap) data.getExtras().get("data");
-                    img_masuk.setImageBitmap(photoAbsen);
+            case REQUEST_CAMERA:
+                if (resultCode == RESULT_OK) {
+                    Bundle extras = data.getExtras();
+                    Bitmap varBitmap = (Bitmap) extras.get("data");
 
-                    bs_absen.setEnabled(true);
-                    bs_absen.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                    bs_absen.setTextColor(getResources().getColor(R.color.white));
+                    Log.d(TAG, "Value Bitmap: " + varBitmap.toString());
 
-                    bs_absen.setOnClickListener(view -> absenMasuk());
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US);
+                    String timeStamp = formatter.format(new Date());
 
-                    break;
-                case Activity.RESULT_CANCELED:
-                    Log.d(TAG, "Maps Activity: Capture foto dibatalkan");
-            }
+                    filesDir = getApplicationContext().getFilesDir();
+                    imageFile = new File(filesDir, timeStamp + ".jpg");
 
+                    try {
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        Bitmap scaleBitmap = Bitmap.createScaledBitmap(varBitmap, 1980, 2640, true);
+                        scaleBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                        String path = MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), scaleBitmap, timeStamp, null);
+
+                        mediaPath = Uri.parse(path);
+                        Log.d(TAG, "Image URI: " + mediaPath);
+
+                        img_masuk.setImageBitmap(varBitmap);
+
+                        bs_absen.setEnabled(true);
+                        bs_absen.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                        bs_absen.setTextColor(getResources().getColor(R.color.white));
+
+                        lrAbsenMasuk.setEnabled(false);
+
+                        bs_absen.setOnClickListener(view -> absenMasuk());
+
+                    } catch (Exception e) {
+                        Log.d(TAG, "Foto exception: " + e.getMessage());
+                    }
+                }
         }
     }
 
@@ -545,8 +610,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             workArea.add(convert);
         }
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        assert mapFragment != null;
         mapFragment.getMapAsync(MapsActivity.this);
 
         if (mMap != null) {
