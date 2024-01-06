@@ -3,10 +3,12 @@ package ac.id.ubpkarawang.sigeoo.Screens;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.AppOpsManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -14,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
+import android.media.AudioAttributes;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -24,10 +27,9 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,15 +82,23 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
+import ac.id.ubpkarawang.sigeoo.BuildConfig;
 import ac.id.ubpkarawang.sigeoo.Helpers.LoadingDialog;
 import ac.id.ubpkarawang.sigeoo.Model.Informasi.MyLatLng;
+import ac.id.ubpkarawang.sigeoo.Model.Utama.AbsenMasukItem;
 import ac.id.ubpkarawang.sigeoo.Model.Utama.SvmItem;
 import ac.id.ubpkarawang.sigeoo.R;
 import ac.id.ubpkarawang.sigeoo.Utils.ApiUtils;
@@ -116,19 +126,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location lastLocation;
     private LoadLocationListener listener;
 
+    private boolean isConnected = false;
+    boolean isOnArea = false;
+
     private static final int REQUEST_CAMERA = 123;
     private static final int REQUEST_LOC = 1001;
     private static final String TAG = "MapsActivity";
 
     private FirebaseUser firebaseUser;
+    double latitude, longitude;
     private Uri mediaPath;
+    public String jamMasuk;
+    public String keteranganAbsen;
 
     BottomSheetDialog bottomSheetDialog;
-    ImageView img_masuk, img_pulang, img_sigeoo, img_close;
+    ImageView img_masuk, img_pulang, img_sigeoo, img_close, img_back;
     MaterialButton bs_absen, btn_maps_proses;
     LinearLayout lrAbsenMasuk, lrAbsenPulang;
+    RelativeLayout rlLoadSuccess;
     View sheetAbsen;
-    TextView txtKetLokasi;
+    TextView txtKetLokasi, txtKetNama, txtKetAkurasi, txtStatus;
     Snackbar snackbar;
     MobileService mobileService, mobileServiceSvm;
     LoadingDialog loadingDialog;
@@ -146,8 +163,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mobileServiceSvm = ApiUtils.servicePython(getApplicationContext());
 
         btn_maps_proses = findViewById(R.id.btn_maps_absen);
+        img_back = findViewById(R.id.back_maps);
         bottomSheetDialog = new BottomSheetDialog(MapsActivity.this, R.style.BottomSheetDialogTheme);
         loadingDialog = new LoadingDialog(MapsActivity.this);
+        rlLoadSuccess = findViewById(R.id.view_success);
 
         sheetAbsen = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_absen, findViewById(R.id.bottom_sheet_masuk));
         img_masuk = sheetAbsen.findViewById(R.id.img_sheet_absen_masuk);
@@ -158,6 +177,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         lrAbsenMasuk = sheetAbsen.findViewById(R.id.lr_sheet_absen_masuk);
         lrAbsenPulang = sheetAbsen.findViewById(R.id.lr_sheet_absen_pulang);
         txtKetLokasi = sheetAbsen.findViewById(R.id.text_sheet_ket);
+        txtKetNama = sheetAbsen.findViewById(R.id.text_sheet_nama);
+        txtKetAkurasi = sheetAbsen.findViewById(R.id.text_sheet_akurasi);
+        txtStatus = sheetAbsen.findViewById(R.id.text_sheet_status);
 
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
@@ -187,22 +209,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setDeniedMessage(R.string.izin_kamera_ditolak)
                 .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA)
                 .check();
+
+        Log.d(TAG, "Fake GPS: " + isMockLocationActive());
+
+        img_back.setOnClickListener(v -> alertDialogCancel());
     }
 
-    private void checkConnection() {
+    // <Info> Setup GPS, Geofance, Staf Marker, Check Connection </Info>
+    private boolean checkConnection() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        boolean checkConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
-        if (isConnected) {
-            Log.d(TAG, "Status koneksi: Hidup");
+        if (checkConnected) {
+            isConnected = true;
         } else {
-
-            Log.d(TAG, "Status koneksi: Mati");
-
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
+            isConnected = false;
         }
+
+        return isConnected;
     }
 
     private void turnOnGPS() {
@@ -261,7 +286,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
             }
         });
     }
@@ -319,75 +343,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationRequest.setSmallestDisplacement(20f);
     }
 
-    private void absenMasuk() {
-        File file = FileUtils.getFile(this, mediaPath);
-
-        RequestBody requestBody = RequestBody.create(MediaType.parse(String.valueOf(mediaPath)), file);
-        MultipartBody.Part partImage = MultipartBody.Part.createFormData("data_gambar", file.getName(), requestBody);
-
-        Log.d(TAG, "Part Image: " + partImage);
-
-        loadingDialog.startLoading();
-        mobileServiceSvm.postImage(partImage).enqueue(new Callback<SvmItem>() {
-            @Override
-            public void onResponse(Call<SvmItem> call, Response<SvmItem> response) {
-                if (response.isSuccessful()) {
-                    SvmItem body = response.body();
-                    if (body.isState()) {
-                        Log.d(TAG, "Proses SVM: Gambar terkirim");
-                    } else {
-                        Log.d(TAG, "Proses SVM: null");
-                    }
-                } else {
-                    Log.d(TAG, "Response: " + response.message());
-                    Log.d(TAG, "Proses SVM: Tidak sukses");
-                }
-                loadingDialog.dismissLoading();
-            }
-
-            @Override
-            public void onFailure(Call<SvmItem> call, Throwable t) {
-                Log.d(TAG, "Proses SVM: Gagal response");
-                loadingDialog.dismissLoading();
-            }
-        });
-    }
-
-    private void sendNotification(String title, String content) {
-        String NOTIFICATION_CHANNEL_ID = "sigeoo_multiple_location";
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Notifikasi",
-                    NotificationManager.IMPORTANCE_DEFAULT);
-
-            notificationChannel.setDescription("Deskripsi Channel");
-            notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.BLUE);
-            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
-            notificationChannel.enableVibration(true);
-
-            notificationManager.createNotificationChannel(notificationChannel);
-        }
-
-        Intent intent = new Intent(this, MapsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
-        builder.setContentTitle(title)
-                .setContentText(content)
-                .setAutoCancel(false)
-                .setSmallIcon(R.drawable.sigeoo)
-                .setOnlyAlertOnce(true)
-                .setContentIntent(pendingIntent);
-
-        Notification notification = builder.build();
-        notificationManager.notify(new Random().nextInt(), notification);
-    }
-
     private void addCircleArea() {
-        if (geoQuery != null){
+        if (geoQuery != null) {
             geoQuery.removeGeoQueryEventListener(this);
             geoQuery.removeAllListeners();
         }
@@ -405,148 +362,58 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             geoQuery.addGeoQueryEventListener(MapsActivity.this);
         }
     }
+    // <Info> Setup GPS, Geofance, Staf Marker, Check Connection </Info>
 
-    private void showDialogClose() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-        alertDialogBuilder
-                .setTitle("Konfirmasi")
-                .setMessage("Apa anda yakin ingin membatalkan proses absen?");
-        alertDialogBuilder
-                .setIcon(R.drawable.warning)
-                .setCancelable(false)
-                .setPositiveButton("Yakin", (dialogInterface, i) -> {
-                    bottomSheetDialog.dismiss();
-
-                    startActivity(new Intent(this, MainActivity.class));
-                    finish();
-                })
-                .setNegativeButton("Kembali", (dialog, which) -> dialog.cancel());
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+    private void openSnackBar(String msg, String act) {
+        snackbar = Snackbar.make(findViewById(android.R.id.content), msg, Snackbar.LENGTH_INDEFINITE);
+        snackbar.setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE);
+        snackbar.setAction(act, view -> {
+            if (act.equalsIgnoreCase("Lanjutkan")) {
+                isOnArea = true;
+                btn_maps_proses.setVisibility(View.VISIBLE);
+            } else if (act.equalsIgnoreCase("Oke")) {
+                isOnArea = true;
+                btn_maps_proses.setVisibility(View.VISIBLE);
+            } else if (act.equalsIgnoreCase("Tutup")) {
+                isOnArea = false;
+                btn_maps_proses.setVisibility(View.GONE);
+            }
+        }).show();
     }
 
-    private void openSnackBar() {
-        snackbar = Snackbar.make(findViewById(android.R.id.content), "Kamu sudah di dalam area kampus", Snackbar.LENGTH_INDEFINITE);
-        snackbar.setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE);
-        snackbar.setAction("Lanjutkan", view -> btn_maps_proses.setVisibility(View.VISIBLE));
+    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
+    private void verifikasiWajah(double lat, double longitude, boolean isOnArea) {
+        if (isOnArea) {
+            if (lat != 0 && longitude != 0) {
+                btn_maps_proses.setOnClickListener(viewProses -> {
+                    bottomSheetDialog.setContentView(sheetAbsen);
+                    bottomSheetDialog.setCanceledOnTouchOutside(false);
+                    bottomSheetDialog.setCancelable(false);
+                    bottomSheetDialog.show();
 
-        snackbar.show();
+                    txtKetLokasi.setText("Lat: " + lat + ", Long: " + longitude);
+
+                    img_masuk.setImageDrawable(getResources().getDrawable(R.drawable.gallery));
+                    img_pulang.setImageDrawable(getResources().getDrawable(R.drawable.gallery));
+                    img_sigeoo.setImageDrawable(getResources().getDrawable(R.drawable.worklocation));
+
+                    bs_absen.setEnabled(false);
+                    bs_absen.setBackgroundColor(getResources().getColor(R.color.white));
+                    bs_absen.setTextColor(getResources().getColor(R.color.colorPrimary));
+
+                    img_close.setOnClickListener(view -> alertDialogCancel());
+                    lrAbsenMasuk.setOnClickListener(viewAbsen -> bukaKamera("Masuk"));
+                });
+            }
+        }
     }
 
-    private void bukaKamera() {
+    private void bukaKamera(String paramStatus) {
+        keteranganAbsen = paramStatus;
         Intent pictureAbsenMasuk = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (pictureAbsenMasuk.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(pictureAbsenMasuk, REQUEST_CAMERA);
         }
-    }
-
-    @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
-        mMap = googleMap;
-        mMap.getUiSettings().setMapToolbarEnabled(true);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
-        mMap.getUiSettings().setCompassEnabled(true);
-
-        if (fusedLocationProviderClient != null) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-        }
-
-        // Circle geoFire
-        addCircleArea();
-    }
-
-    @Override
-    protected void onStop() {
-        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-        super.onStop();
-    }
-
-    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
-    @Override
-    public void onKeyEntered(String key, GeoLocation location) {
-        checkConnection();
-
-        sendNotification(firebaseUser.getDisplayName(), String.format("sudah memasuki area kampus", key));
-
-        double latitude = location.latitude;
-        double longitude = location.longitude;
-
-        // Buka SnackBar
-        openSnackBar();
-
-        btn_maps_proses.setOnClickListener(viewProses -> {
-            bottomSheetDialog.setContentView(sheetAbsen);
-            bottomSheetDialog.setCanceledOnTouchOutside(false);
-            bottomSheetDialog.setCancelable(false);
-            bottomSheetDialog.show();
-
-            btn_maps_proses.setVisibility(View.GONE);
-
-            txtKetLokasi.setText("Lat: " + latitude + ", Long: " + longitude);
-
-            img_masuk.setImageDrawable(getResources().getDrawable(R.drawable.gallery));
-            img_pulang.setImageDrawable(getResources().getDrawable(R.drawable.gallery));
-            img_sigeoo.setImageDrawable(getResources().getDrawable(R.drawable.worklocation));
-
-            bs_absen.setEnabled(false);
-            bs_absen.setBackgroundColor(getResources().getColor(R.color.white));
-            bs_absen.setTextColor(getResources().getColor(R.color.colorPrimary));
-
-            lrAbsenMasuk.setOnClickListener(viewAbsen -> bukaKamera());
-        });
-
-        img_close.setOnClickListener(view -> showDialogClose());
-    }
-
-    @Override
-    public void onKeyExited(String key) {
-        checkConnection();
-
-        sendNotification(firebaseUser.getDisplayName(), String.format("sudah keluar dari area kampus", key));
-
-        bs_absen.setEnabled(false);
-        bs_absen.setBackgroundColor(getResources().getColor(R.color.white));
-        bs_absen.setTextColor(getResources().getColor(R.color.colorPrimary));
-
-        Animation fadeOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out);
-        btn_maps_proses.startAnimation(fadeOut);
-        btn_maps_proses.setVisibility(View.GONE);
-
-        if (snackbar.isShown()) {
-            snackbar.dismiss();
-        }
-
-        if (bottomSheetDialog.isShowing()) {
-            bottomSheetDialog.dismiss();
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    @Override
-    public void onKeyMoved(String key, GeoLocation location) {
-        checkConnection();
-
-        double latitude = location.latitude;
-        double longitude = location.longitude;
-
-        txtKetLokasi.setText("Lat: " + latitude + ", Long: " + longitude);
-
-        sendNotification(firebaseUser.getDisplayName(), String.format("sedang bergerak didalam area kampus", key));
-    }
-
-    @Override
-    public void onGeoQueryReady() {
-    }
-
-    @Override
-    public void onGeoQueryError(DatabaseError error) {
-        Log.d(TAG, "Maps Activity: " + error.getMessage());
     }
 
     @Override
@@ -555,7 +422,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Log.d(TAG, "Request Code: " + requestCode);
 
-        switch (requestCode){
+        switch (requestCode) {
             case REQUEST_LOC:
                 if (resultCode == RESULT_OK) {
                     Log.d(TAG, "Maps Activity: Lokasi diaktifkan");
@@ -591,13 +458,377 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         lrAbsenMasuk.setEnabled(false);
 
-                        bs_absen.setOnClickListener(view -> absenMasuk());
+                        //Verifikasi absen masuk
+                        deteksiSVMPython();
+
+                        bs_absen.setOnClickListener(view -> {
+                            if (isMockLocationActive()) {
+                                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+                                alertDialogBuilder
+                                        .setTitle("Peringatan")
+                                        .setMessage("Kamu menggunakan lokasi palsu! Silahkan matikan di pengaturan.");
+                                alertDialogBuilder
+                                        .setIcon(R.drawable.warning)
+                                        .setCancelable(false)
+                                        .setPositiveButton("Oke", (dialogInterface, i) -> {
+                                            startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
+                                        });
+
+                                AlertDialog alertDialog = alertDialogBuilder.create();
+                                alertDialog.show();
+                            }
+
+                            alertDialogQuestion("Konfirmasi", "Apakah data yang tercantum sudah sesuai?");
+                        });
 
                     } catch (Exception e) {
                         Log.d(TAG, "Foto exception: " + e.getMessage());
                     }
                 }
         }
+    }
+
+    private boolean isMockLocationActive() {
+        boolean isMockLocation;
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                AppOpsManager opsManager = (AppOpsManager) getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
+                isMockLocation = (Objects.requireNonNull(opsManager).checkOp(AppOpsManager.OPSTR_MOCK_LOCATION, android.os.Process.myUid(), BuildConfig.APPLICATION_ID) == AppOpsManager.MODE_ALLOWED);
+            } else {
+                isMockLocation = !android.provider.Settings.Secure.getString(getApplicationContext().getContentResolver(), "mock_location").equals("0");
+
+            }
+            Log.d(TAG, "mocklocation: " + isMockLocation);
+
+        } catch (Exception e) {
+            return false;
+        }
+        return isMockLocation;
+    }
+
+    // Request Deteksi Wajah (SVM) ke BE python
+    private void deteksiSVMPython() {
+        Bundle extras = getIntent().getExtras();
+        if (extras == null) {
+            jamMasuk = null;
+        } else {
+            jamMasuk = extras.getString("jam_masuk");
+        }
+
+        Log.d(TAG, "Data Jam Masuk: " + jamMasuk);
+
+        Date time = Calendar.getInstance().getTime();
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss");
+        String formatTime = currentTime.format(time);
+
+        try {
+            Date time1 = currentTime.parse(formatTime);
+            Date time2 = currentTime.parse(jamMasuk);
+
+            long elapsed = time1.getTime() - time2.getTime();
+            int hours = (int) ((elapsed / (1000 * 60 * 60)) % 24);
+
+            Log.d(TAG, String.valueOf(elapsed));
+            Log.d(TAG, "Perbandingan: " + hours);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        File file = FileUtils.getFile(this, mediaPath);
+        RequestBody requestBody = RequestBody.create(MediaType.parse(String.valueOf(mediaPath)), file);
+        MultipartBody.Part partImage = MultipartBody.Part.createFormData("data_gambar", file.getName(), requestBody);
+
+        Log.d(TAG, "Part Image: " + partImage);
+
+        loadingDialog.startLoading();
+        mobileServiceSvm.postImage(partImage).enqueue(new Callback<SvmItem>() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onResponse(@NonNull Call<SvmItem> call, @NonNull Response<SvmItem> response) {
+                if (response.isSuccessful()) {
+                    SvmItem body = response.body();
+                    if (body.isState()) {
+                        Log.d(TAG, "Proses SVM: Gambar terkirim");
+                        if (body.getData() != null) {
+                            String prediksiNama = body.getData().get(0).getName();
+                            String prediksiAccuracy = body.getData().get(0).getAccuracy();
+
+                            double percentPredict = Double.parseDouble(prediksiAccuracy);
+                            NumberFormat format = NumberFormat.getPercentInstance(Locale.US);
+                            String percentPrediksi = format.format(percentPredict);
+
+                            txtKetNama.setText(prediksiNama);
+                            txtKetAkurasi.setText(percentPrediksi);
+
+                            if (formatTime.compareTo(jamMasuk) > 0) {
+                                txtStatus.setTextColor(getResources().getColor(R.color.red_pink));
+                                txtStatus.setText("Telat");
+                            } else if (formatTime.compareTo(jamMasuk) < 0) {
+                                txtStatus.setTextColor(getResources().getColor(R.color.teal_200));
+                                txtStatus.setText("Tidak Telat");
+                            } else if (formatTime.compareTo(jamMasuk) == 0) {
+                                txtStatus.setTextColor(getResources().getColor(R.color.teal_200));
+                                txtStatus.setText("Tepat Waktu");
+                            }
+                        }
+                    } else {
+                        Log.d(TAG, "Proses SVM: state false");
+                    }
+                } else {
+                    Log.d(TAG, "Response: " + response.message());
+                    Log.d(TAG, "Proses SVM: tidak sukses");
+                }
+
+                loadingDialog.dismissLoading();
+            }
+
+            @Override
+            public void onFailure(Call<SvmItem> call, Throwable t) {
+                Log.d(TAG, "Proses SVM: gagal response");
+                loadingDialog.dismissLoading();
+            }
+        });
+    }
+
+    // Post Data Absensi Staf to DB Local
+    private void absenStaf() {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss");
+
+        double latitudeUser = lastLocation.getLatitude();
+        double longitudeUser = lastLocation.getLongitude();
+
+        String currentDate = date.format(new Date());
+        String currentTime = time.format(new Date());
+
+        String ketAkurasi = txtKetAkurasi.getText().toString().trim();
+        String statusAbsen = txtStatus.getText().toString().trim();
+
+        if (keteranganAbsen == null) {
+            Log.d(TAG, "Status Absen: Null");
+        }
+
+        Map<String, String> map = new HashMap<>();
+        map.put("id_staf", firebaseUser.getUid());
+        map.put("tgl_absen", currentDate);
+        map.put("jam_absen", currentTime);
+        map.put("lat_absen", String.valueOf(latitudeUser));
+        map.put("long_absen", String.valueOf(longitudeUser));
+        map.put("akurasi_absen", ketAkurasi);
+        map.put("keterangan_absen", keteranganAbsen);
+        map.put("status_absen", statusAbsen);
+
+        Log.d(TAG, "Mapping: " + map);
+
+        loadingDialog.startLoading();
+
+        if (!checkConnection()) {
+            // Simpan data ke local storage
+        } else {
+            mobileService.postAbsenMasuk(map).enqueue(new Callback<AbsenMasukItem>() {
+                @Override
+                public void onResponse(Call<AbsenMasukItem> call, Response<AbsenMasukItem> response) {
+                    if (response.isSuccessful()) {
+                        AbsenMasukItem body = response.body();
+                        if (body.isState()) {
+                            Log.d(TAG, "Proses Absen: data terkirim");
+                            if (body.getData() != null) {
+                                Log.d(TAG, "Proses Absen: " + body.getData());
+                                sendNotification("Notifikasi Absensi", "Horeey proses absensi berhasil. Terima kasih ^_^");
+
+                                loadingDialog.dismissLoading();
+                                Toast.makeText(getApplicationContext(), body.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+
+                            loadingDialog.dismissLoading();
+                            Toast.makeText(getApplicationContext(), body.getMessage(), Toast.LENGTH_LONG).show();
+                            startActivity(new Intent(MapsActivity.this, MainActivity.class));
+                            finish();
+
+                        } else {
+                            Log.d(TAG, "Proses Absen: state false");
+                            loadingDialog.dismissLoading();
+                        }
+                    } else {
+                        Log.d(TAG, "Response: " + response.message());
+                        Log.d(TAG, "Proses Absen: tidak sukses");
+                    }
+
+                    loadingDialog.dismissLoading();
+                }
+
+                @Override
+                public void onFailure(Call<AbsenMasukItem> call, Throwable t) {
+                    Log.d(TAG, "Proses Absen: gagal response");
+                    loadingDialog.dismissLoading();
+                }
+            });
+        }
+    }
+
+    private void sendNotification(String title, String content) {
+        String NOTIFICATION_CHANNEL_ID = "sigeoo_multiple_location";
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
+        inboxStyle.addLine(content);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Notifikasi",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+
+            notificationChannel.setDescription("Deskripsi Channel");
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.BLUE);
+            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
+            notificationChannel.enableVibration(true);
+            notificationChannel.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getApplicationContext().getPackageName() + "/" + R.raw.notification),
+                    new AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                            .build());
+            notificationChannel.setShowBadge(true);
+
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+
+        Intent intent = new Intent(this, MapsActivity.class);
+
+        PendingIntent pendingIntent = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+        builder.setContentTitle(title)
+                .setVibrate(new long[]{0, 100})
+                .setPriority(Notification.PRIORITY_MAX)
+                .setContentText(content)
+                .setAutoCancel(false)
+                .setSmallIcon(R.drawable.info)
+                .setStyle(inboxStyle)
+                .setOnlyAlertOnce(true)
+                .setContentIntent(pendingIntent);
+
+        Notification notification = builder.build();
+        notificationManager.notify(new Random().nextInt(), notification);
+    }
+
+    private void alertDialogQuestion(String status, String message) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        alertDialogBuilder
+                .setTitle(status)
+                .setMessage(message);
+        alertDialogBuilder
+                .setCancelable(true)
+                .setPositiveButton("Lanjut", (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    absenStaf();
+                })
+                .setNegativeButton("Kembali", (dialog, which) -> dialog.cancel());
+
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    private void alertDialogCancel() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        alertDialogBuilder
+                .setTitle("Informasi")
+                .setMessage("Apa anda yakin ingin membatalkan proses absen?");
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("Yakin", (dialogInterface, i) -> {
+                    bottomSheetDialog.dismiss();
+                    isOnArea = false;
+
+                    startActivity(new Intent(this, MainActivity.class));
+                    finish();
+                })
+                .setNegativeButton("Kembali", (dialog, which) -> dialog.cancel());
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    // <Info> Implement Method OnMapReadyCallback, GeoQueryEventListener, LoadLocationListener </Info>
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.getUiSettings().setMapToolbarEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
+
+        if (fusedLocationProviderClient != null) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+        }
+
+        // Circle geoFire
+        addCircleArea();
+    }
+
+    @Override
+    public void onKeyEntered(String key, GeoLocation location) {
+        checkConnection();
+
+        latitude = location.latitude;
+        longitude = location.longitude;
+
+        String msg = "Kamu sudah di dalam area kampus";
+        String act = "Lanjutkan";
+
+        // Buka SnackBar
+        openSnackBar(msg, act);
+        verifikasiWajah(latitude, longitude, isOnArea);
+    }
+
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void onKeyMoved(String key, GeoLocation location) {
+        checkConnection();
+
+        latitude = location.latitude;
+        longitude = location.longitude;
+
+        String msg = "Kamu sedang bergerak di area kampus";
+        String act = "Oke";
+
+        // Buka SnackBar
+        openSnackBar(msg, act);
+        verifikasiWajah(latitude, longitude, isOnArea);
+    }
+
+    @Override
+    public void onKeyExited(String key) {
+        checkConnection();
+
+        String msg = "Kamu sedang di luar area kampus";
+        String act = "Tutup";
+
+        // Buka SnackBar
+        openSnackBar(msg, act);
+    }
+
+    @Override
+    public void onGeoQueryReady() {
+    }
+
+    @Override
+    public void onGeoQueryError(DatabaseError error) {
+        Log.d(TAG, "Maps Activity: " + error.getMessage());
     }
 
     @Override
@@ -628,5 +859,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onLoadLocationFailed(String message) {
         Log.d(TAG, "Maps Lokasi: " + message);
+    }
+    // <Info> Implement Method OnMapReadyCallback, GeoQueryEventListener, LoadLocationListener </Info>
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        Log.d(TAG, "onStop Running");
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        checkConnection();
+        if (fusedLocationProviderClient != null) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+        }
     }
 }

@@ -24,10 +24,6 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
-
 import java.util.List;
 
 import ac.id.ubpkarawang.sigeoo.Adapters.ViewPagerAdapter;
@@ -148,17 +144,6 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(() -> doubleBackToExit = false, 2000);
     }
 
-    private final BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
-        @Override
-        public void onManagerConnected(int status) {
-            if (status == LoaderCallbackInterface.SUCCESS) {
-                Log.d(TAG, "Status OpenCV: Sukses diload");
-            } else {
-                super.onManagerConnected(status);
-            }
-        }
-    };
-
     private void checkConnection() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
@@ -178,12 +163,5 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if (!OpenCVLoader.initDebug()) {
-            Log.d(TAG, "Library OpenCV tidak ditemukan. Menggunakan OpenCV Manager untuk inisialisasi");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_4_0, this, mLoaderCallback);
-        } else {
-            Log.d(TAG, "Library OpenCV ditemukan di dalam paket!");
-            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-        }
     }
 }

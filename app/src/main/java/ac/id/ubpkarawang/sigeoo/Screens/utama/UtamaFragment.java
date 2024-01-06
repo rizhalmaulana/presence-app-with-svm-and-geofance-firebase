@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -30,7 +29,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -59,11 +57,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ac.id.ubpkarawang.sigeoo.BuildConfig;
 import ac.id.ubpkarawang.sigeoo.Model.Utama.JamKerjaItem;
 import ac.id.ubpkarawang.sigeoo.R;
 import ac.id.ubpkarawang.sigeoo.Screens.LoginActivity;
@@ -92,6 +88,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     private static final int REQUEST_CHECK_SETTING = 1001;
     private static final String TAG = "UtamaFragment";
 
+    public String jamMasuk, jamPulang;
     private Geocoder geocoder;
     private GoogleMap mMap;
     private LocationRequest locationRequest;
@@ -128,7 +125,12 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         // Inisialisasi Mobile Service
         mobileService = ApiUtils.MobileService(getContext());
 
-        lrLokasi.setOnClickListener(view1 -> startActivity(new Intent(getActivity(), MapsActivity.class)));
+        lrLokasi.setOnClickListener(view1 -> {
+            Intent mapsIntent = new Intent(getActivity(), MapsActivity.class);
+            mapsIntent.putExtra("jam_masuk", jamMasuk);
+            startActivity(mapsIntent);
+        });
+
         lrLogout.setOnClickListener(view2 -> showDialog());
         cvPeriksa.setOnClickListener(view3 -> startActivity(new Intent(getActivity(), PeriksaActivity.class)));
 
@@ -139,33 +141,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         bs_absen_masuk = sheetMasuk.findViewById(R.id.btn_sheet_absen);
         lrAbsenMasuk = sheetMasuk.findViewById(R.id.lr_sheet_absen_masuk);
 
-        getOfficeHours();
         refreshLocationSchedule();
-
-        Log.d(TAG, "Fake GPS: " + isMockLocationEnabled());
-
-    }
-
-    private boolean isMockLocationEnabled()
-    {
-        boolean isMockLocation;
-
-        try {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                AppOpsManager opsManager = (AppOpsManager) requireActivity().getSystemService(Context.APP_OPS_SERVICE);
-                isMockLocation = (Objects.requireNonNull(opsManager).checkOp(AppOpsManager.OPSTR_MOCK_LOCATION, android.os.Process.myUid(), BuildConfig.APPLICATION_ID)== AppOpsManager.MODE_ALLOWED);
-
-                Log.d(TAG, "mocklocation: " + isMockLocation);
-            } else {
-                isMockLocation = !android.provider.Settings.Secure.getString(requireActivity().getContentResolver(), "mock_location").equals("0");
-
-                Log.d(TAG, "mocklocation: " + isMockLocation);
-            }
-
-        } catch (Exception e) {
-            return false;
-        }
-        return isMockLocation;
     }
 
     private void getOfficeHours() {
@@ -173,31 +149,33 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         @SuppressLint("SimpleDateFormat") SimpleDateFormat parsingDate = new SimpleDateFormat("EEEE");
         String strDate = parsingDate.format(c.getTime());
 
-        Log.d(TAG,"Date Indonesia : " + strDate);
+        Log.d(TAG,"Date Indonesia: " + strDate);
 
         Map<String, String> map = new HashMap<>();
         map.put("hari_ini", strDate);
 
         mobileService.postJam(map).enqueue(new Callback<JamKerjaItem>() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
             @SuppressLint("SetTextI18n")
             @Override
             public void onResponse(@NonNull Call<JamKerjaItem> call, @NonNull retrofit2.Response<JamKerjaItem> response) {
                 JamKerjaItem body = response.body();
                 if (response.isSuccessful()) {
                     if (body.isState()) {
-                        Log.d(TAG, "Result jam kerja: " + body.getData().get(0).getStart_time());
+                        Log.d("JamMasuk", "Result jam kerja: " + body.getData().get(0).getStart_time());
 
-                        txtJamMasuk.setText(body.getData().get(0).getStart_time());
-                        txtJamPulang.setText(body.getData().get(0).getEnd_time());
+                        jamMasuk = body.getData().get(0).getStart_time();
+                        jamPulang = body.getData().get(0).getEnd_time();
+
+                        txtJamMasuk.setText(jamMasuk);
+                        txtJamPulang.setText(jamPulang);
                     } else {
-                        Log.d(TAG, "State jam kerja: null");
+                        Log.d("JamMasuk", "State jam kerja: state false");
 
                         txtJamMasuk.setText("08:00");
                         txtJamPulang.setText("16:00");
                     }
                 } else {
-                    Log.d(TAG, "Jam Kerja status: not success");
+                    Log.d("JamMasuk", "Jam Kerja status: not success");
 
                     txtJamMasuk.setText("08:00");
                     txtJamPulang.setText("16:00");
@@ -207,7 +185,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             @SuppressLint("SetTextI18n")
             @Override
             public void onFailure(@NonNull Call<JamKerjaItem> call, @NonNull Throwable t) {
-                Log.d(TAG, "Failure result: " + t.getMessage());
+                Log.d("JamMasuk", "Jam Kerja status: Failure, " + t.getMessage());
 
                 txtJamMasuk.setText("08:00");
                 txtJamPulang.setText("16:00");
@@ -234,7 +212,7 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             }
         };
 
-        timer.schedule(doTask, 0, 60 * 1000);
+        timer.schedule(doTask, 0, 50 * 100);
     }
 
     private boolean isGPSEnabled() {
@@ -249,35 +227,14 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     private void getCurrentLocation() {
         Log.d(TAG, "Lokasi: Get Current Lokasi");
-
-        rlViewLoadUtama.setVisibility(View.VISIBLE);
-        lrViewMenuUtama.setVisibility(View.GONE);
-        rlViewTopbar.setVisibility(View.GONE);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 if (isGPSEnabled()) {
-//                    if (!isMockLocationEnabled()) {
-//                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-//
-//                        alertDialogBuilder
-//                                .setTitle("Peringatan")
-//                                .setMessage("Kamu menggunakan lokasi palsu! Silahkan matikan di pengaturan.");
-//                        alertDialogBuilder
-//                                .setIcon(R.drawable.warning)
-//                                .setCancelable(false)
-//                                .setPositiveButton("Oke", (dialogInterface, i) -> {
-//                                    startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
-//                                });
-//
-//                        AlertDialog alertDialog = alertDialogBuilder.create();
-//                        alertDialog.show();
-//                    }
-
                     Log.d(TAG, "Lokasi: GPS " + isGPSEnabled());
 
                     buildLocationManager();
                     buildLocationCallback();
+                    getOfficeHours();
 
                     LocationServices.getFusedLocationProviderClient(requireContext())
                             .requestLocationUpdates(locationRequest, new LocationCallback() {
@@ -299,17 +256,8 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                                             List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
                                             txtLokasi.setText(addresses.get(0).getAddressLine(0));
 
-                                            rlViewLoadUtama.setVisibility(View.GONE);
-                                            lrViewMenuUtama.setVisibility(View.VISIBLE);
-                                            rlViewTopbar.setVisibility(View.VISIBLE);
-
                                         } catch (IOException exception) {
                                             Log.d(TAG, "Lokasi: exception " + exception.getLocalizedMessage());
-
-                                            rlViewLoadUtama.setVisibility(View.GONE);
-                                            lrViewMenuUtama.setVisibility(View.VISIBLE);
-                                            rlViewTopbar.setVisibility(View.VISIBLE);
-
                                             exception.printStackTrace();
                                         }
                                     }
@@ -436,13 +384,20 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     public void onResume() {
         super.onResume();
 
-        new Handler().postDelayed(() -> {
-            if (isGPSEnabled()) {
-                getCurrentLocation();
-                getOfficeHours();
-            }
-            refresh_utama.setRefreshing(false);
-        }, 3000);
+        rlViewLoadUtama.setVisibility(View.VISIBLE);
+        lrViewMenuUtama.setVisibility(View.GONE);
+        rlViewTopbar.setVisibility(View.GONE);
+
+        if (isGPSEnabled()) {
+            getCurrentLocation();
+            getOfficeHours();
+        }
+
+        rlViewLoadUtama.setVisibility(View.GONE);
+        lrViewMenuUtama.setVisibility(View.VISIBLE);
+        rlViewTopbar.setVisibility(View.VISIBLE);
+
+        refresh_utama.setRefreshing(false);
     }
 
     @Override
@@ -457,15 +412,20 @@ public class UtamaFragment extends Fragment implements SwipeRefreshLayout.OnRefr
 
     @Override
     public void onRefresh() {
-        new Handler().postDelayed(() -> {
-            if (isGPSEnabled()) {
-                getCurrentLocation();
-                getOfficeHours();
-            } else {
-                turnOnGPS();
-            }
-            refresh_utama.setRefreshing(false);
-        }, 3000);
+        rlViewLoadUtama.setVisibility(View.VISIBLE);
+        lrViewMenuUtama.setVisibility(View.GONE);
+        rlViewTopbar.setVisibility(View.GONE);
+
+        if (isGPSEnabled()) {
+            getCurrentLocation();
+            getOfficeHours();
+        }
+
+        rlViewLoadUtama.setVisibility(View.GONE);
+        lrViewMenuUtama.setVisibility(View.VISIBLE);
+        rlViewTopbar.setVisibility(View.VISIBLE);
+
+        refresh_utama.setRefreshing(false);
     }
 
     @Override

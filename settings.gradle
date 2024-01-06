@@ -1,3 +1,2 @@
 rootProject.name = "Sigeoo"
 include ':app'
-include ':openCVLibrary3414'

@@ -3,7 +3,6 @@ package ac.id.ubpkarawang.sigeoo.Screens;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -78,15 +77,13 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (authResult.getAdditionalUserInfo().isNewUser()) {
                         Log.d(TAG, "onSuccess: Akun dibuat");
-                        Toast.makeText(this, "Akun berhasil dibuat..", Toast.LENGTH_SHORT).show();
                     }
 
                     Staf user = new Gson().fromJson(new Gson().toJson(stafUser), Staf.class);
                     Preferences.setStaf(getApplicationContext(), user);
 
-                    Log.d(TAG, "Login: " + user.getUsername());
+                    Log.d(TAG, "Login Sukses: " + user.getUsername());
 
-                    Toast.makeText(this, "Welcome " + username + ". Have a nice day!", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(this, MainActivity.class));
                     finish();
 

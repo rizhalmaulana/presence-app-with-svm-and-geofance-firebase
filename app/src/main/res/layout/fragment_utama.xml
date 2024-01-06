@@ -8,7 +8,7 @@
 
     <include
         android:id="@+id/view_load_utama"
-        layout="@layout/view_loading_utama"
+        layout="@layout/view_loading"
         android:visibility="gone" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

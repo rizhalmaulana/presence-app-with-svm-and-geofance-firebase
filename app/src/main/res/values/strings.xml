@@ -1,11 +1,9 @@
 <resources>
     <string name="app_name">Sigeoo</string>
     <string name="todo">TODO</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="informasi">Informasi</string>
     <string name="utama">Utama</string>
     <string name="profil">Profil</string>
-    <string name="informasi_login">Kamu belum login, Ayo login sekarang agar dapat melakukan presensi. </string>
 
     <string name="grayscale">1. Grayscale</string>
     <string name="crop">Crop</string>
@@ -19,23 +17,10 @@
 
     <string name="eigenfaces">Eigenfaces with NN</string>
     <string name="imageReshaping">Image Reshaping with SVM</string>
-    <string name="tensorflow">TensorFlow with SVM or KNN</string>
     <string name="caffe">Caffe with SVM or KNN</string>
 
-    <string name="knn">K Nearest Neighbor</string>
-    <string name="svm">Support Vector Machine</string>
     <string name="izin_kamera">"kita membutuhkan izin untuk mengakses <b>kamera</b> dan menemukan <b>lokasi</b> kamu."</string>
     <string name="izin_kamera_ditolak">"Jika kamu menolak, kamu tidak dapat menggunakan layanan lokasi dan absen.\n\nSilahkan nyalakan izin pada [Setting] > [Permission]"</string>
-
-    <string name="outputLayerCaffe">fc7</string>
-
-    <string name="haarcascade_default">haarcascade_frontalface_default</string>
-    <string name="haarcascade_alt">haarcascade_frontalface_alt</string>
-    <string name="lbpcascade">lbpcascade_frontalface</string>
-    <string name="classifier_350kids">02_Classifier_350kids</string>
-    <string name="classifier_200adults_350kids">01_Classifier_200adults_350kids</string>
-
-    <string name="haarcascade_eye">haarcascade_eye</string>
 
     <string name="modelFileCaffe">VGG_FACE_deploy.prototxt</string>
     <string name="weightsFileCaffe">VGG_FACE.caffemodel</string>
@@ -73,8 +58,8 @@
     <string name="test_resiko_covid_19">TEST RESIKO COVID-19</string>
     <string name="mari_tandai_kegiatan_anda_untuk_bersatu_melawan_penyebaran_covid_19">MARI TANDAI KEGIATAN ANDA, UNTUK BERSATU MELAWAN PENYEBARAN COVID-19</string>
     <string name="a_potensi_tertular_diluar_rumah">A. POTENSI TERTULAR DILUAR RUMAH</string>
-    <string name="title_activity_geofence">GeofenceActivity</string>
     <string name="masuk_dengan_google">Masuk dengan google</string>
     <string name="lokasi_saat_ini">Lokasi Saat Ini</string>
     <string name="internal_storage">Internal storage</string>
+    <string name="deteksi_wajah">Deteksi Wajah</string>
 </resources>

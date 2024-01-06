@@ -3,9 +3,9 @@ package ac.id.ubpkarawang.sigeoo.Utils;
 public class Static {
     public final static String MyPref = "my_pref";
 
-    public final static String LOCALURL = "http://192.168.191.228:8080";
-    public final static String LOCALPYTHON = "http://192.168.191.93:8089";
-    public final static String SERVERURL = "https://rupadi.clikini.com";
+    public final static String LOCALURL = "http://192.168.75.228:8080";
+    public final static String LOCALPYTHON = "http://192.168.75.228:8089";
+//    public final static String SERVERURL = "https://rupadi.clikini.com";
 
     public final static String LOCALURL_DEV = "http://10.0.2.2:8080";
 
@@ -18,9 +18,9 @@ public class Static {
 
     public final static String STORAGE_BANNER_API = LOCALURL+"/assets/banner/";
 
-    public final static String STORAGE_BANNER = SERVERURL+"/public/banner/";
-    public final static String STORAGE_PRODUK = SERVERURL+"/public/foto-brg/";
-    public final static String STORAGE_BLOG = SERVERURL+"/public/blog/";
+//    public final static String STORAGE_BANNER = SERVERURL+"/public/banner/";
+//    public final static String STORAGE_PRODUK = SERVERURL+"/public/foto-brg/";
+//    public final static String STORAGE_BLOG = SERVERURL+"/public/blog/";
 
     public final static String LOGIN_TYPE = "LOGIN_TYPE";
     public final static String LOGIN_KEY = "LOGIN_KEY";
@@ -29,4 +29,5 @@ public class Static {
     public final static String TOKEN = "TOKEN_KEY";
 
     public final static String USER_DATA = "USER_DATA";
+    public final static String USER_ABSEN = "USER_ABSEN";
 }

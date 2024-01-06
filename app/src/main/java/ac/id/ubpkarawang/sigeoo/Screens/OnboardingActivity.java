@@ -53,8 +53,8 @@ public class OnboardingActivity extends AppCompatActivity {
 
                 Log.d(TAG, "OnBoard: " + stafUser.getUsername());
                 Log.d(TAG, "OnBoard Firebase: " + firebaseUser.getDisplayName());
+                Log.d(TAG, "Login Sukses: " + firebaseUser.getDisplayName());
 
-                Toast.makeText(this, "Hai " + firebaseUser.getDisplayName() + ". Welcome Back!", Toast.LENGTH_LONG).show();
                 startActivity(new Intent(this, MainActivity.class));
                 finish();
             } else {

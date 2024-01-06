@@ -4,9 +4,6 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Environment;
 
-import org.opencv.android.Utils;
-import org.opencv.core.Mat;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -81,46 +78,6 @@ public class FileHelper {
 
     public File[] getDetectionTestList() {
         return getListOfFiles(DETECTION_TEST_PATH);
-    }
-
-    public void saveMatListToXml(List<MatName> matList, String path, String filename){
-        createFolderIfNotExisting(path);
-        MatXml matXml = new MatXml();
-        matXml.create(path + filename);
-        for(MatName mat : matList){
-            matXml.writeMat(mat.getName(), mat.getMat());
-        }
-        matXml.release();
-    }
-
-    public List<MatName> getMatListFromXml(List<MatName> matList, String path, String filename){
-        String filepath = path + filename;
-        MatXml matXml = new MatXml();
-        File file = new File(filepath);
-        if (file.exists()){
-            matXml.open(filepath);
-            for (MatName mat : matList){
-                mat.setMat(matXml.readMat(mat.getName()));
-            }
-        }
-        return matList;
-    }
-
-    public String saveMatToImage(MatName m, String path){
-        new File(path).mkdirs();
-        String fullpath = path + m.getName() + ".png";
-        Mat mat = m.getMat();
-        Bitmap bitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(mat, bitmap);
-        File file = new File(fullpath);
-        try {
-            FileOutputStream os = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
-            os.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return fullpath;
     }
 
     public void saveBitmapToImage(Bitmap bmp){

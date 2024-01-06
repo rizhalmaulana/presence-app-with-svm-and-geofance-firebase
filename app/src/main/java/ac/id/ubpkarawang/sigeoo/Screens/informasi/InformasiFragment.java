@@ -111,11 +111,9 @@ public class InformasiFragment extends Fragment implements SwipeRefreshLayout.On
         recycle_banner.setLayoutManager(layoutBanner);
 
         loadInformasi();
-        loadBanner();
     }
 
     private void loadInformasi() {
-
         view_load.setVisibility(View.VISIBLE);
         refresh_informasi.setVisibility(View.GONE);
 
@@ -126,14 +124,9 @@ public class InformasiFragment extends Fragment implements SwipeRefreshLayout.On
                 Log.d(TAG, "Status Covid: Berhasil diload");
                 Log.d(TAG, "Response Covid: " + response.body());
 
-                if (response.body() == null) {
-                    konfirmasi.setText("-");
-                    sembuh.setText("-");
-                    meninggal.setText("-");
-                    positif.setText("-");
+                DataIndonesia body = response.body();
 
-                    lrInfoCovid.setVisibility(View.GONE);
-                } else {
+                if (body != null) {
                     int responseKonfirmasi = Integer.parseInt(response.body().getCases());
                     int responseSembuh = Integer.parseInt(response.body().getRecovered());
                     int responseMeninggal = Integer.parseInt(response.body().getDeaths());
@@ -144,25 +137,23 @@ public class InformasiFragment extends Fragment implements SwipeRefreshLayout.On
                     String formatMeninggal = String.format(Locale.US, "%,d", responseMeninggal).replace(',', '.');
                     String formatPositif = String.format(Locale.US, "%,d", responsePositif).replace(',', '.');
 
-                    konfirmasi.setText(formatKonfirmasi);
-                    sembuh.setText(formatSembuh);
-                    meninggal.setText(formatMeninggal);
-                    positif.setText(formatPositif);
-
                     ApiInformasiService apiInformasiService = RetrofitClient.serviceBerita().create(ApiInformasiService.class);
                     Call<BeritaResponse> callBerita = apiInformasiService.getBeritaTerkini(Static.API_KEY_BERITA_TERKINI);
                     callBerita.enqueue(new Callback<BeritaResponse>() {
                         @Override
                         public void onResponse(@NonNull Call<BeritaResponse> callBeritaResponse, @NonNull Response<BeritaResponse> beritaResponse) {
                             assert beritaResponse.body() != null;
-
                             listBerita = beritaResponse.body().getResults();
                             recycle_informasi.setAdapter(new BeritaAdapter(getContext(), listBerita));
-
                             Log.d(TAG, "Status data berita: " + beritaResponse.body().getResults());
 
                             //Load Banner API
                             loadBanner();
+
+                            konfirmasi.setText(formatKonfirmasi);
+                            sembuh.setText(formatSembuh);
+                            meninggal.setText(formatMeninggal);
+                            positif.setText(formatPositif);
                         }
 
                         @Override
@@ -171,8 +162,14 @@ public class InformasiFragment extends Fragment implements SwipeRefreshLayout.On
                             Toast.makeText(getContext(), "Koneksi kamu bermasalah, coba lagi.", Toast.LENGTH_SHORT).show();
                         }
                     });
-                }
+                } else {
+                    konfirmasi.setText("-");
+                    sembuh.setText("-");
+                    meninggal.setText("-");
+                    positif.setText("-");
 
+                    lrInfoCovid.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -191,10 +188,9 @@ public class InformasiFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     private void loadBanner() {
-        Call<BannerItem> dataBanner = RetrofitClient.servicesBanner().getbanner();
-        dataBanner.enqueue(new Callback<BannerItem>() {
+        mobileService.getbanner().enqueue(new Callback<BannerItem>() {
             @Override
-            public void onResponse(@NonNull Call<BannerItem> call, @NonNull Response<BannerItem> response) {
+            public void onResponse(Call<BannerItem> call, Response<BannerItem> response) {
                 BannerItem body = response.body();
                 if (response.isSuccessful()){
                     assert body != null;
@@ -207,8 +203,6 @@ public class InformasiFragment extends Fragment implements SwipeRefreshLayout.On
                         recycle_banner.setVisibility(View.GONE);
                         card_banner.setVisibility(View.VISIBLE);
 
-                        refresh_informasi.setVisibility(View.VISIBLE);
-                        view_load.setVisibility(View.GONE);
                     } else {
                         Log.d(TAG, "Status data banner: " + body.getData());
 
@@ -235,14 +229,15 @@ public class InformasiFragment extends Fragment implements SwipeRefreshLayout.On
                         recycle_banner.setVisibility(View.VISIBLE);
                         card_banner.setVisibility(View.GONE);
 
-                        refresh_informasi.setVisibility(View.VISIBLE);
-                        view_load.setVisibility(View.GONE);
                     }
+
+                    refresh_informasi.setVisibility(View.VISIBLE);
+                    view_load.setVisibility(View.GONE);
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<BannerItem> call, @NonNull Throwable t) {
+            public void onFailure(Call<BannerItem> call, Throwable t) {
                 Log.d(TAG, "Status Banner: " + t);
 
                 recycle_banner.setVisibility(View.GONE);
@@ -252,7 +247,6 @@ public class InformasiFragment extends Fragment implements SwipeRefreshLayout.On
                 view_load.setVisibility(View.GONE);
             }
         });
-
     }
 
     private void initialize() {
@@ -264,19 +258,19 @@ public class InformasiFragment extends Fragment implements SwipeRefreshLayout.On
 
     @Override
     public void onRefresh() {
-        new Handler().postDelayed(() -> {
-            loadInformasi();
-            loadBanner();
-            refresh_informasi.setRefreshing(false);
-        }, 3000);
+        Log.d(TAG, "onRefresh Running");
+        view_load.setVisibility(View.VISIBLE);
+
+        loadInformasi();
+        refresh_informasi.setRefreshing(false);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume Running");
 
         loadInformasi();
-        loadBanner();
     }
 
     @Override

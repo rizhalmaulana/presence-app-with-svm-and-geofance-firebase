@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 
 import ac.id.ubpkarawang.sigeoo.Model.Akun.Staf;
+import ac.id.ubpkarawang.sigeoo.Model.Utama.AbsenMasuk;
 
 public class Preferences {
     public static Staf getStaf(Context context){
@@ -19,6 +20,19 @@ public class Preferences {
 
     public static void setStaf(Context context, Staf staf){
         putString(context, Static.USER_DATA, new Gson().toJson(staf));
+    }
+
+    public static AbsenMasuk getAbsen(Context context){
+        try{
+            String json = getString(context, Static.USER_ABSEN);
+            return new Gson().fromJson(json, AbsenMasuk.class);
+        }catch (Exception e){
+            return null;
+        }
+    }
+
+    public static void setAbsen(Context context, AbsenMasuk absenMasuk){
+        putString(context, Static.USER_ABSEN, new Gson().toJson(absenMasuk));
     }
 
     public static String getToken(Context context){
